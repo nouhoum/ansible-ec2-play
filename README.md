@@ -24,7 +24,7 @@ The following scripts are available in the `yaml` directory:
 
 * `bootstrap`: secures an EC2 Ubuntu AMI. Requires `sudo`.
 * `playenv`: sets play dependencies (pvm, java) including Authbind so Play can use port 80 without root privileges. Requires `sudo`.
-* `deploy`: clones a Play project from a Git repository and deploys it on the machine. No sudo required.
+* `deploy`: clones a Play project from a Git repository and deploys it on the machine. `sudo` is not required.
 
 * Run individual Ansible scripts this way:
 ````
