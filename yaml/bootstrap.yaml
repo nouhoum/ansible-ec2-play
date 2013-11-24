@@ -3,8 +3,8 @@
 ---
 - hosts: ec2Instance
   vars:
-  - ubuntu_release: quantal
-  - logwatch_email: aracon81@gmail.com
+  - ubuntu_release: $ENV(ANSIBLE_UBUNTU_RELEASE)
+  - logwatch_email: $ENV(ANSIBLE_LOGWATCH_EMAIL)
   - ec2_user: ubuntu
 
   tasks:

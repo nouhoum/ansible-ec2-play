@@ -1,2 +1,2 @@
-postfix/mailname string perevillega.com
+postfix/mailname string mslinn.com
 postfix/main_mailer_type string 'Internet Site'

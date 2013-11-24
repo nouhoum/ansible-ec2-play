@@ -1,0 +1,20 @@
+#!/bin/bash
+
+function help {
+  echo "Execute an Ansible script as the current user or superuser"
+  echo "Usage: $(basename $0) script [sudo]"
+  echo "  Where script is one of bootstrap, playenv or deploy"
+  echo "  Specifying a second parameter will cause the script to be run as superuser"
+  exit -1
+}
+
+if [ -z "$1" ]; then help; fi
+if [ "$2" ]; then SUDO="--sudo"; fi
+
+# Make the root directory of this project current
+DIR="$( cd "$( dirname "${bash_source[0]}" )" && pwd )"
+cd $DIR
+#echo "Running from $(pwd)"
+
+ansible-playbook -vvv -i hosts.ini yaml/$1.yaml -u ubuntu $SUDO
+

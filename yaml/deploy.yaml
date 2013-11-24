@@ -5,19 +5,18 @@
 ---
 - hosts: ec2Instance
   vars:
-  - ubuntu_release: quantal
+  - ubuntu_release: $ENV(ANSIBLE_UBUNTU_RELEASE)
   - user: ubuntu
   - group: ubuntu
   - home: /home/ubuntu
-  - repo_url: git://github.com/pvillega/personal-page.git 
+  - repo_url: $ENV(ANSIBLE_REPO_URL)
   - repo_remote: origin
   - repo_version: master
-  - play_version: 2.1.0
+  - play_version: $ENV(ANSIBLE_PLAY_VERSION)
   - pvm_path: ${home}/pvm/install/$play_version
   - dest: ${home}/projectClone
   - project_version: 1.2
-  - project: personal-page-$project_version
-
+  - project: $ENV(ANSIBLE_PLAY_APP_NAME)-$project_version
 
   tasks:
    - name: Remove old checkouts (just in case they are still in there)

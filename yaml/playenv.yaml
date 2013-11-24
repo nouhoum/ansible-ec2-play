@@ -3,14 +3,14 @@
 ---
 - hosts: ec2Instance
   vars:
-  - ubuntu_release: quantal
+  - ubuntu_release: $ENV(ANSIBLE_UBUNTU_RELEASE)
   - user: ubuntu
   - group: $user
   - repo_url: git://github.com/kaiinkinen/pvm.git
   - repo_remote: origin
   - repo_version: master
   - pvm: /home/ubuntu/pvm
-  - play_version: 2.1.1
+  - play_version: $ENV(ANSIBLE_PLAY_VERSION)
 
   tasks:
    - name: Install Unzip
