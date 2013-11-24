@@ -2,7 +2,7 @@
 This is a set of Ansible scripts to deploy Play 2 projects in EC2 instances.
 The EC2 instances should be 'small' or larger; 'micro' instances won't compile.
 
-** WARNING: USE AT YOUR OWN RISK. NO WARRANTY, EXPRESS OR IMPLIED IS PROVIDED. ASSUME THIS PROJECT WAS CREATED BY FOOLS! **
+**WARNING: USE AT YOUR OWN RISK. NO WARRANTY, EXPRESS OR IMPLIED IS PROVIDED. ASSUME THIS PROJECT WAS CREATED BY FOOLS!**
 
 Steps to use:
 
