@@ -10,8 +10,7 @@ Steps to use:
 * edit `yaml/config/postfix_selections` to set domains for email 
 * Add the Amazon AWS keys for your EC2 instances to your local `ssh` repository by running the following:
 ```` 
-    ssh-agent    
-    ssh-add ~/path/to/foo.pem
+    ssh-agent && ssh-add ~/path/to/foo.pem
 ````
 
 ## Scripts
