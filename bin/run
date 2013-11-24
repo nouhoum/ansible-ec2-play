@@ -8,13 +8,23 @@ function help {
   exit -1
 }
 
-if [ -z "$1" ]; then help; fi
-if [ "$2" ]; then SUDO="--sudo"; fi
-
 # Make the root directory of this project current
 DIR="$( cd "$( dirname "${bash_source[0]}" )" && pwd )"
 cd $DIR
-#echo "Running from $(pwd)"
+echo "Running from $(pwd)"
+
+if [ -f bin/custom ]; then
+  source bin/custom
+else
+  echo "Error: bin/custom does not exist. Create it by typing the following:"
+  echo "cp bin/custom{.sample,}"
+  echo ""
+  echo "After creating it, edit bin/custom as required, then run this command again"
+  exit -2
+fi
+
+if [ -z "$1" ]; then help; fi
+if [ "$2" ]; then SUDO="--sudo"; fi
 
 ansible-playbook -vvv -i hosts.ini yaml/$1.yaml -u ubuntu $SUDO
 
