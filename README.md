@@ -2,7 +2,7 @@
 This is a set of Ansible scripts to deploy Play 2 projects in EC2 instances.
 The EC2 instances should be 'small' or larger; 'micro' instances won't compile.
 
-*** WARNING: USE AT YOUR OWN RISK. NO WARRANTY, EXPRESS OR IMPLIED IS PROVIDED. ASSUME THIS PROJECT WAS CREATED BY FOOLS! ***
+** WARNING: USE AT YOUR OWN RISK. NO WARRANTY, EXPRESS OR IMPLIED IS PROVIDED. ASSUME THIS PROJECT WAS CREATED BY FOOLS! **
 
 Steps to use:
 
@@ -14,7 +14,9 @@ Steps to use:
     ssh-add ~/path/to/foo.pem
 
 ## Scripts
-Scripts may contain variables that need to be customized for your specific deployments. Commonly modified variables have been factored into `bin/custom.sample`. Make a copy of that file and save as `bin/custom` before modifying.
+Scripts may contain variables that need to be customized for your specific deployments. 
+Commonly modified variables have been factored into `bin/custom.sample`. 
+Make a copy of that file and save as `bin/custom` before modifying.
 
     cp bin/custom{.sample,}
 
