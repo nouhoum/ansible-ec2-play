@@ -15,7 +15,7 @@
   - play_version: $ENV(ANSIBLE_PLAY_VERSION)
   - pvm_path: ${home}/pvm/install/$play_version
   - dest: ${home}/projectClone
-  - project_version: 1.2
+  - project_version: $ENV(ANSIBLE_PLAY_APP_VERSION)
   - project: $ENV(ANSIBLE_PLAY_APP_NAME)-$project_version
 
   tasks:
@@ -25,10 +25,11 @@
    - name: Checkout project from Git
      action: git repo=$repo_url dest=$dest remote=$repo_remote version=$repo_version
 
-   # Create distribution async, polling every 10s (Default) for a max of 15m (60s * 15m = 900s)
+   # Create distribution async, polling every 30s for a max of 22.5m (60s * 22.5m = 1350s)
    - name: Create Dist deployment
      action: shell cd ${dest} && ${pvm_path}/play dist 
-     async: 900
+     async: 1350
+     poll: 30
 
    # We ignore errors as there may be no running Java process	
    - name: Kill old processes to free ports and memory and so we can redeploy
