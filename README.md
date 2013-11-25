@@ -34,7 +34,7 @@ transport=ssh
 ```` 
     ssh-agent && ssh-add ~/path/to/foo.pem
 ````
-5. Edit `hostIds` and enter your ec2 instance id(s), one per line.
+5. Edit `hostIds` and enter your ec2 instance id(s), one per line. Keep this file up to date as you add and remove EC2 instances.
 6. Run `bin/makeHostIni` to create or update `hosts.ini`. Do this every time you add an ec2 instance id to `hostIds`. 
    You also need to do this each time an AWS EC2 instance is restarted because the IP address will change.
 
