@@ -26,9 +26,8 @@
    # Help on Play app options: ${home}/$project/bin/$ENV(ANSIBLE_PLAY_APP_NAME)-h
    # See http://www.playframework.com/documentation/2.2.1/ProductionConfiguration
    - name: Launch project
-     command: (sleep 2; /bin/echo "Of course your realize that this means war" > $home/nohup.out)
-     #command: /usr/bin/authbind $app $std_opts -mem 1024
-     async: 15
+     action: command $home/runapp $app $std_opts -mem 1024
+     async: 40
      poll: 0
 
    - name: tail
