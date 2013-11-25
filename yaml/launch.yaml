@@ -1,14 +1,13 @@
-# Clones and builds the application on the server
-# Assumes a working Play deployment (via pvm: https://github.com/kaiinkinen/pvm) and Git are available
-# WARNING: if your server has low memory (like a Micro EC2 instance) the build step may fail due to the OOM manager killing it. Enable swap or add more memory to the server.
+# Runs a Play 2 application, built using deploy.yaml
 # Run with: ansible-playbook -i hosts.ini launch.yaml -u ubuntu 
 ---
 - hosts: ec2Instance
   vars:
-  - home: /home/ubuntu
+  - user: ubuntu
+  - home: /home/$user
   - project_version: $ENV(ANSIBLE_PLAY_APP_VERSION)
   - project: $ENV(ANSIBLE_PLAY_APP_NAME)-$project_version
-  - app: ${home}/$project/bin/$ENV(ANSIBLE_PLAY_APP_NAME)
+  - app: $home/$project/bin/$ENV(ANSIBLE_PLAY_APP_NAME)
   - pid_file: /var/run/play.pid
   - std_opts: -J-Dhttp.port=80 -J-server -J-Dpidfile.path=$pid_file -J-XX:+UseCompressedOops -J-XX:+PerfDisableSharedMem
 
@@ -20,17 +19,18 @@
    - name: Remove old PID file, if it exists
      action: file path=$pid_file state=absent
 
-   - name: Remove old nohup.out file, if it exists
-     action: file path=nohup.out state=absent
+   - name: Remove old $home/nohup.out file, if it exists
+     action: file path=$home/nohup.out state=absent
 
    # Launch project asynchronously with fire-and-forget 
    # See http://www.playframework.com/documentation/2.2.1/ProductionConfiguration
    # See http://manpages.ubuntu.com/manpages/saucy/man1/authbind.1.html
    # Help on options: ${home}/$project/bin/$ENV(ANSIBLE_PLAY_APP_NAME)-h
    - name: Launch project
-     action: shell nohup authbind $app $std_opts -mem 1024 > nohup.oout
-     async: 5
+     command: /bin/echo "Of course your realize that this means war" > $home/nohup.out
+     #command: /usr/bin/authbind $app $std_opts -mem 1024
+     async: 15
      poll: 0
 
    - name: tail
-     action: shell tail -f nohup.out
+     action: shell tail -f $home/nohup.out
