@@ -38,7 +38,7 @@ transport=ssh
 6. Run `bin/makeHostIni` to create or update `hosts.ini`. Do this every time you add an ec2 instance id to `hostIds`. 
    You also need to do this each time an AWS EC2 instance is restarted because the IP address will change.
 
-## Scripts
+## Ansible Scripts
 Scripts may contain variables that need to be customized for your specific deployments. 
 Commonly modified variables have been factored into `bin/custom.sample`. 
 Make a copy of that file and save as `bin/custom` before modifying.
@@ -60,6 +60,9 @@ Run individual Ansible scripts this way:
 You can also run all of the scripts in order this way:
 
     bin/runAll
+
+## Utility Scripts
+The `bin` directory contains miscellaneous utility scripts.
 
 ## References
 * [The original source which inspired most of these scripts](https://github.com/phred/5minbootstrap)
