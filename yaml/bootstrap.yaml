@@ -10,10 +10,10 @@
   tasks:
    - name: Update APT package cache
      action: apt update_cache=yes
- 
+
    - name: Run apt-get upgrade
      action: apt upgrade=yes
- 
+
    - name: Install fail2ban
      action: apt pkg=fail2ban state=installed
 
@@ -27,20 +27,23 @@
 
    # Ensure only selected users can sudo
    - name: create group admin
-     action: group name=admin 
+     action: group name=admin
+
    - name: add ec2 user to admin group
      action: command usermod -a -G admin $ec2_user
+
    - name: Protect su by limiting access only to admin group.
      action: command dpkg-statoverride --update --force --add root admin 4750 /bin/su
 
    - name: Install rootkit detection
      action: apt pkg=chkrootkit state=present
+
    - name: Install rootkit detection
      action: apt pkg=rkhunter state=present  
 
    - name: Install unattended-upgrades
      action: apt pkg=unattended-upgrades state=present
-   
+
    - name: Adjust APT update intervals
      action: copy src=config/apt_periodic dest=/etc/apt/apt.conf.d/10periodic
 
@@ -59,33 +62,43 @@
    # Set firewall
    - name: Firewall allow ssh (ufw enable has to be run manually)
      action: command ufw allow ssh
+
    - name: Firewall allow http (ufw enable has to be run manually)
      action: command ufw allow http
+
    - name: Firewall allow https (ufw enable has to be run manually)
      action: command ufw allow https
 
    - name: Prevent IP spoofing
      action: lineinfile dest=/etc/host.conf regexp="^order" line="order bind,hosts" state=present  
+
    - name: Prevent IP spoofing
      action: lineinfile dest=/etc/host.conf regexp="^nospoof" line="nospoof on" state=present
 
    - name: Intrusion detection PSAD
-     action: apt pkg=psad state=present  
+     action: apt pkg=psad state=present
+
    - name: Configure PSAD
      action: lineinfile dest=/etc/psad/psad.conf regexp="^EMAIL_ADDRESSES" line="EMAIL_ADDRESSES             $logwatch_email;" state=present
+
    - name: Configure PSAD (IPtables)
      action: command iptables -A INPUT -j LOG
+
    - name: Configure PSAD (IPtables)
      action: command iptables -A FORWARD -j LOG
+
    - name: Configure PSAD (IP6tables)
      action: command ip6tables -A INPUT -j LOG
+
    - name: Configure PSAD (IP6tables)
      action: command ip6tables -A FORWARD -j LOG
+
    - name: Configure PSAD (update signatures)
      action: command psad --sig-update
 
    - name: SELinux 
-     action: apt pkg=apparmor state=present  
+     action: apt pkg=apparmor state=present
+
    - name: SELinux
      action: apt pkg=apparmor-profiles state=present  
 
@@ -101,5 +114,3 @@
   handlers:
    - name: Restart sshd
      action: service sshd state=restarted
-
-
