@@ -4,12 +4,12 @@
 - hosts: ec2Instance
   vars:
   - ubuntu_release: $ENV(ANSIBLE_UBUNTU_RELEASE)
-  - user: ubuntu
+  - user: $ENV(ANSIBLE_USER_ID)
   - group: $user
   - repo_url: git://github.com/kaiinkinen/pvm.git
   - repo_remote: origin
   - repo_version: master
-  - pvm: /home/ubuntu/pvm
+  - pvm: /home/$user/pvm
   - play_version: $ENV(ANSIBLE_PLAY_VERSION)
 
   tasks:

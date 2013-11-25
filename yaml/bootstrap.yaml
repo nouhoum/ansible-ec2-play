@@ -5,7 +5,7 @@
   vars:
   - ubuntu_release: $ENV(ANSIBLE_UBUNTU_RELEASE)
   - logwatch_email: $ENV(ANSIBLE_LOGWATCH_EMAIL)
-  - ec2_user: ubuntu
+  - ec2_user: $ENV(ANSIBLE_USER_ID)
 
   tasks:
    - name: Update APT package cache

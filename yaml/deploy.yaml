@@ -6,8 +6,8 @@
 - hosts: ec2Instance
   vars:
   - ubuntu_release: $ENV(ANSIBLE_UBUNTU_RELEASE)
-  - user: ubuntu
-  - group: ubuntu
+  - user: $ENV(ANSIBLE_USER_ID)
+  - group: $ENV(ANSIBLE_USER_ID)
   - home: /home/$user
   - repo_url: $ENV(ANSIBLE_REPO_URL)
   - repo_remote: origin

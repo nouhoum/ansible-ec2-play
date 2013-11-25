@@ -3,7 +3,7 @@
 ---
 - hosts: ec2Instance
   vars:
-  - user: ubuntu
+  - user: $ENV(ANSIBLE_USER_ID)
   - home: /home/$user
   - project_version: $ENV(ANSIBLE_PLAY_APP_VERSION)
   - project: $ENV(ANSIBLE_PLAY_APP_NAME)-$project_version

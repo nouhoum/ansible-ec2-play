@@ -1,0 +1,15 @@
+#!/bin/bash
+DIR="$( cd "$( dirname "${bash_source[0]}" )" && pwd )"
+
+function help {
+  echo "Usage: $(basename $0) ec2HostId"
+  exit -1
+}
+
+if [ $# -eq 0 ] || [ $# -gt 1 ]; then help; fi
+
+source custom
+
+IPADDR=`bin/ec2Info -n $1`
+ssh -i $AWS_EC2_PEM $ANSIBLE_USER_ID@$IPADDR
+
