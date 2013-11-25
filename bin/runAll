@@ -1,6 +1,6 @@
 #!/bin/bash
 
-run bootstrap sudo
-run playenv sudo
-run deploy
-
+run "$@" -s bootstrap
+run "$@" -s playenv
+run "$@" deploy
+run "$@" launch

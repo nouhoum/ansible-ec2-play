@@ -1,8 +1,9 @@
 # Ansible EC2 Play Framework
-This is a set of Ansible scripts to deploy Play 2 projects in EC2 instances.
+This is a set of Ansible scripts to deploy Play 2.2+ projects in EC2 instances.
+Play 2.2 uses SBT 0.13, and has a different deploy directory, which is handled in this version.
 The EC2 instances should be 'small' or larger; 'micro' instances won't compile.
 
-**WARNING: USE AT YOUR OWN RISK. NO WARRANTY, EXPRESS OR IMPLIED IS PROVIDED. ASSUME THIS PROJECT WAS CREATED BY FOOLS!**
+**WARNING: USE AT YOUR OWN RISK. NO WARRANTY, EXPRESS OR IMPLIED IS PROVIDED.**
 
 ## Steps
 
@@ -20,9 +21,17 @@ ssh-keyscan github.com >> /etc/ssh/ssh_known_hosts
 ssh-keyscan bitbucket.org >> /etc/ssh/ssh_known_hosts
 ````
     b. Add the public key for your EC2 instances to the owner's account of the github or bitbucket repository
-2. Edit `hosts.ini` and set your ec2 instance name(s)
-3. Edit `yaml/config/postfix_selections` to set domains for email 
-4. Add the Amazon AWS keys for your EC2 instances to your local `ssh` repository by running the following:
+2. Edit `/etc/ansible/ansible.cfg` and change this:
+````
+transport=paramiko
+````
+to this:
+````
+transport=ssh
+````
+3. Edit `hosts.ini` and set your ec2 instance name(s)
+4. Edit `yaml/config/postfix_selections` to set domains for email 
+5. Add the Amazon AWS keys for your EC2 instances to your local `ssh` repository by running the following:
 ```` 
     ssh-agent && ssh-add ~/path/to/foo.pem
 ````
@@ -39,6 +48,8 @@ The following scripts are available in the `yaml` directory:
 * `bootstrap`: secures an EC2 Ubuntu AMI. Requires `sudo`.
 * `playenv`: sets play dependencies (pvm, java) including Authbind so Play can use port 80 without root privileges. Requires `sudo`.
 * `deploy`: clones a Play project from a Git repository and deploys it on the machine. `sudo` is not required.
+* `launch`: Launches the deployed app, killing it first if necessary. `sudo` is not required.
+   [Authbind](http://en.wikipedia.org/wiki/Authbind) must be installed on the server so Play can run on port 80 without root privileges. 
 
 Run individual Ansible scripts this way:
 
@@ -47,12 +58,6 @@ Run individual Ansible scripts this way:
 You can also run all of the scripts in order this way:
 
     bin/runAll
-
-## Start file
-The settings assume the use of [Authbind](http://en.wikipedia.org/wiki/Authbind) so Play can run on port 80 without root privileges. 
-A `start` file is provided in the `exec` directory which can be used as a template for your own `start` file.
-
-Deployment scripts assume you check in your customized `start` file at the root of the git project. Modify the script accordingly if that is not the case.
 
 ## References
 * [The original source which inspired most of these scripts](https://github.com/phred/5minbootstrap)

@@ -2,16 +2,39 @@
 
 function help {
   echo "Execute an Ansible script as the current user or superuser"
-  echo "Usage: $(basename $0) script [sudo]"
-  echo "  Where script is one of bootstrap, playenv or deploy"
-  echo "  Specifying a second parameter will cause the script to be run as superuser"
+  echo "Usage: $(basename $0) options script"
+  echo "Where: "
+  echo "  options can include:"
+  echo "    -d causes the script to be dry run"
+  echo "    -s causes the script to be run as superuser"
+  echo "    -t enables trace output"
+  echo "    -v increments verbose output (can be specified up to 3 times)"
+  echo "  script is one of bootstrap, playenv or deploy"
   exit -1
 }
 
 # Make the root directory of this project current
 DIR="$( cd "$( dirname "${bash_source[0]}" )" && pwd )"
 cd $DIR
-echo "Running from $(pwd)"
+
+verbose=""
+while getopts "dhstv?" opt; do
+  case $opt in
+    d ) DRYRUN="--check" ;;
+    h ) help ;;
+    s ) SUDO="--sudo" ;;
+    t ) TRACE="set -xv" ;;
+    v ) verbose="-v $verbose" ;;
+    \?) help ;;
+  esac
+done
+shift $(($OPTIND-1))
+
+if [ -z "$1" ]; then help; fi
+
+if [ "$verbose" ]; then
+  echo "Running from $(pwd)"
+fi
 
 if [ -f bin/custom ]; then
   source bin/custom
@@ -23,8 +46,5 @@ else
   exit -2
 fi
 
-if [ -z "$1" ]; then help; fi
-if [ "$2" ]; then SUDO="--sudo"; fi
-
-ansible-playbook -vvv -i hosts.ini yaml/$1.yaml -u ubuntu $SUDO
-
+$TRACE
+ansible-playbook $DRYRUN $verbose -i hosts.ini yaml/$1.yaml -u ubuntu $SUDO
