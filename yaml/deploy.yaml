@@ -60,10 +60,3 @@
 
    - name: Remove old checkouts (let's clean the house a bit)
      action: file path=${dest} state=absent
-
-   # Launch project asynchronously with fire-and-forget behaviour
-   # Help on options: ${home}/$project/bin/$ENV(ANSIBLE_PLAY_APP_NAME)-h
-   - name: Launch project
-     action: shell nohup authbind ${home}/$project/bin/$ENV(ANSIBLE_PLAY_APP_NAME) -J-Dhttp.port=80 -mem 1024 -J-server &
-     async: 30
-     poll: 10
