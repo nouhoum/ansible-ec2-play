@@ -30,10 +30,10 @@
      action: group name=admin
 
    - name: add ec2 user to admin group
-     action: command usermod -a -G admin $ec2_user
+     command: usermod -a -G admin $ec2_user
 
    - name: Protect su by limiting access only to admin group.
-     action: command dpkg-statoverride --update --force --add root admin 4750 /bin/su
+     command: dpkg-statoverride --update --force --add root admin 4750 /bin/su
 
    - name: Install rootkit detection
      action: apt pkg=chkrootkit state=present
@@ -51,7 +51,7 @@
      copy: src=config/postfix_selections  dest=/tmp/postfix_selections
 
    - name: Set up Postfix to relay mail
-     action: command debconf-set-selections /tmp/postfix_selections
+     command: debconf-set-selections /tmp/postfix_selections
 
    - name: Install logwatch
      action: apt pkg=logwatch state=installed
@@ -61,13 +61,13 @@
 
    # Set firewall
    - name: Firewall allow ssh (ufw enable has to be run manually)
-     action: command ufw allow ssh
+     command: ufw allow ssh
 
    - name: Firewall allow http (ufw enable has to be run manually)
-     action: command ufw allow http
+     command: ufw allow http
 
    - name: Firewall allow https (ufw enable has to be run manually)
-     action: command ufw allow https
+     command: ufw allow https
 
    - name: Prevent IP spoofing
      action: lineinfile dest=/etc/host.conf regexp="^order" line="order bind,hosts" state=present  
@@ -82,19 +82,19 @@
      action: lineinfile dest=/etc/psad/psad.conf regexp="^EMAIL_ADDRESSES" line="EMAIL_ADDRESSES             $logwatch_email;" state=present
 
    - name: Configure PSAD (IPtables)
-     action: command iptables -A INPUT -j LOG
+     command: iptables -A INPUT -j LOG
 
    - name: Configure PSAD (IPtables)
-     action: command iptables -A FORWARD -j LOG
+     command: iptables -A FORWARD -j LOG
 
    - name: Configure PSAD (IP6tables)
-     action: command ip6tables -A INPUT -j LOG
+     command: ip6tables -A INPUT -j LOG
 
    - name: Configure PSAD (IP6tables)
-     action: command ip6tables -A FORWARD -j LOG
+     command: ip6tables -A FORWARD -j LOG
 
    - name: Configure PSAD (update signatures)
-     action: command psad --sig-update
+     command: psad --sig-update
 
    - name: SELinux 
      action: apt pkg=apparmor state=present
@@ -109,7 +109,7 @@
      action: lineinfile dest=/etc/fstab  regexp="^tmpfs" line="tmpfs     /dev/shm     tmpfs     defaults,noexec,nosuid     0     0" state=present
 
    - name: Reboot
-     action: command reboot
+     command: reboot
 
   handlers:
    - name: Restart sshd

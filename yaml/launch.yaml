@@ -10,25 +10,38 @@
   - app: $home/$project/bin/$ENV(ANSIBLE_PLAY_APP_NAME)
   - pid_file: /var/run/play.pid
   - std_opts: -J-Dhttp.port=80 -J-server -J-Dpidfile.path=$pid_file -J-XX:+UseCompressedOops -J-XX:+PerfDisableSharedMem
+  - java_opts: $ENV(JAVA_OPTS)
 
   tasks:
-   - name: Kill all old Java processes (includes Play) to free ports and memory
-     action: command killall java -q
-     ignore_errors: yes
+  # - name: Kill all old Java processes (includes Play) to free ports and memory
+  #   command: killall java -q
+  #   ignore_errors: yes
 
-   - name: Remove old PID file if it exists
-     action: file path=$pid_file state=absent
+  # - name: Remove old PID file if it exists
+  #   action: file path=$pid_file state=absent
 
-   - name: Remove old $home/nohup.out file if it exists
-     action: file path=$home/nohup.out state=absent
+  # - name: Remove old $home/nohup.out file if it exists
+  #   action: file path=$home/nohup.out state=absent
 
    # See http://manpages.ubuntu.com/manpages/saucy/man1/authbind.1.html
    # Help on Play app options: ${home}/$project/bin/$ENV(ANSIBLE_PLAY_APP_NAME)-h
    # See http://www.playframework.com/documentation/2.2.1/ProductionConfiguration
+
+   # runapp looks like this:
+   # #!/bin/bash
+   # killall java -q
+   # rm -f /var/run/play.pid
+   # rm -f nohup.out
+   # exec authbind $@ &
+   #
+   # The app launches, runs for 40 seconds, and then stops. Both command and shell do the same.
+   # raw and script don't work asynchronously.
+   # Not sure how to get this to work
    - name: Launch project
-     action: command $home/runapp $app $std_opts -mem 1024
+     #shell: $home/runapp $app $std_opts -mem 1024
+     shell: nohup $home/runapp $app $std_opts $java_opts
      async: 40
      poll: 0
 
-   - name: tail
-     action: shell tail -f $home/nohup.out
+   #- name: tail
+   #  action: shell tail -f $home/nohup.out

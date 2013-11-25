@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# Runs Play app on remote server, via the launch.yaml script
+
+killall java -q
+
+rm -f /var/run/play.pid
+rm -f nohup.out
+
+exec authbind $@ &
