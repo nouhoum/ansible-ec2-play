@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# Create hosts.ini from contents of hostIds
+
+DIR="$( cd "$( dirname "${bash_source[0]}" )" && pwd )"
+cd $DIR
+
+echo "[ec2Instance]" > hosts.ini
+for id in `cat hostIds`; do
+  bin/ec2Info -n $id >> hosts.ini
+done
+

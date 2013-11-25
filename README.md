@@ -29,12 +29,14 @@ to this:
 ````
 transport=ssh
 ````
-3. Edit `hosts.ini` and set your ec2 instance name(s)
-4. Edit `yaml/config/postfix_selections` to set domains for email 
-5. Add the Amazon AWS keys for your EC2 instances to your local `ssh` repository by running the following:
+3. Edit `yaml/config/postfix_selections` to set domains for email 
+4. Add the Amazon AWS keys for your EC2 instances to your local `ssh` repository by running the following:
 ```` 
     ssh-agent && ssh-add ~/path/to/foo.pem
 ````
+5. Edit `hostIds` and enter your ec2 instance id(s), one per line.
+6. Run `bin/makeHostIni` to create or update `hosts.ini`. Do this every time you add an ec2 instance id to `hostIds`. 
+   You also need to do this each time an AWS EC2 instance is restarted because the IP address will change.
 
 ## Scripts
 Scripts may contain variables that need to be customized for your specific deployments. 

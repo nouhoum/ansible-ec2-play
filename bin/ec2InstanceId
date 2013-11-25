@@ -1,0 +1,14 @@
+#!/bin/bash
+# Given an EC2 domain name or IP address, returns the EC2 instance id
+# Domain name must be of the form: ec2-54-196-57-227.compute-1.amazonaws.com
+
+# Sample usage:
+# aws ec2 stop-instances --instance-ids `ec2InstanceId ec2-54-196-57-227.compute-1.amazonaws.com`
+# aws ec2 start-instances --instance-ids `ec2InstanceId ec2-54-196-57-227.compute-1.amazonaws.com`
+
+if [[ "$1" == *.amazonaws.com ]]; then
+  FILTER_NAME=dns-name
+else
+  FILTER_NAME=ip-address
+fi
+aws ec2 describe-instances --filters Name=$FILTER_NAME,Values=$1 | grep "InstanceId" | cut -d'"' -f4

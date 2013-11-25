@@ -1,0 +1,25 @@
+#!/bin/bash
+
+function help {
+  echo "Given an EC2 instance id, return the IP address or domain name"
+  echo "Usage: $(basename $0) option i-7cf09e18"
+  echo "Where option is one of:"
+  echo "  -i return IP address"
+  echo "  -n return DNS name"
+  exit -1
+}
+
+if [ $# == 0 ] || [ $# -gt 2 ]; then help; fi
+
+INFO=PublicIpAddress
+while getopts "dinh?" opt; do
+  case $opt in
+    d) set -xv ;;
+    i) ;;
+    n) INFO=PublicDnsName ;;
+    *) help ;;
+  esac
+done
+shift $(($OPTIND-1))
+
+aws ec2 describe-instances --filters Name=instance-id,Values=$1 | grep "$INFO" | cut -d'"' -f4
