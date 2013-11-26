@@ -3,6 +3,8 @@ This is a set of Ansible scripts to deploy Play 2.2+ projects in EC2 instances.
 Play 2.2 uses SBT 0.13, and has a different deploy directory, which is handled in this version.
 The EC2 instances should be 'small' or larger; 'micro' instances won't compile.
 
+This project uses EC2 instance IDs to reference EC2 instances, because their IP addresses and DNS names change on every restart - unless you have provisioned permanent IP addresses.
+
 **WARNING: USE AT YOUR OWN RISK. NO WARRANTY, EXPRESS OR IMPLIED IS PROVIDED.**
 
 ## Steps
@@ -36,7 +38,7 @@ transport=ssh
 ````
 5. Edit `hostIds` and enter your ec2 instance id(s), one per line. Keep this file up to date as you add and remove EC2 instances.
 6. Run `bin/makeHostIni` to create or update `hosts.ini`. Do this every time you add an ec2 instance id to `hostIds`. 
-   You also need to do this each time an AWS EC2 instance is restarted because the IP address will change.
+   You also need to do this each time an AWS EC2 instance is restarted unless you have provisioned permanent IP addresses.
 
 ## Ansible Scripts
 Scripts may contain variables that need to be customized for your specific deployments. 
@@ -63,6 +65,22 @@ You can also run all of the scripts in order this way:
 
 ## Utility Scripts
 The `bin` directory contains miscellaneous utility scripts.
+
+## Hints
+If you add the following to ~/.bash_aliases:
+
+````
+alias ec2stop="aws ec2 stop-instances --instance-ids"
+alias ec2start="aws ec2 start-instances --instance-ids"
+````
+
+... then you can start and stop EC2 instances by mentioning their instance IDs, like this:
+
+
+````
+ec2start i-7cf09e18
+ec2stop i-7cf09e18
+````
 
 ## References
 * [The original source which inspired most of these scripts](https://github.com/phred/5minbootstrap)
