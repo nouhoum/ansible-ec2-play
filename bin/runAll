@@ -2,5 +2,6 @@
 
 run "$@" -s bootstrap
 run "$@" -s playenv
+run "$@" -s service
 run "$@" deploy
 run "$@" launch
