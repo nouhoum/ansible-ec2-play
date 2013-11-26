@@ -76,7 +76,7 @@ If you are logged into the remote server, you can start, restart and stop the Pl
     sudo service play stop
 
 ### Bash Aliases
-If you add the following to ~/.bash_aliases:
+If you add the following to `~/.bash_aliases`:
 
 ````
 alias ec2stop="aws ec2 stop-instances --instance-ids"
