@@ -13,4 +13,3 @@ source custom
 
 IPADDR=`bin/ec2Info -n $1`
 ssh -i $AWS_EC2_PEM $ANSIBLE_USER_ID@$IPADDR
-
