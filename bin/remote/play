@@ -1,3 +1,6 @@
+# Debian-compatible system service definition
+# Gets patched by Ansible service.yaml script
+
 PIDFILE=/var/run/play.pid
 
 start() {
