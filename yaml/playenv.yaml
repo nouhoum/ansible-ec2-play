@@ -1,5 +1,5 @@
 # Sets the Play environment in the server
-# Run with: ansible-playbook -i hosts.ini playenv.yaml -u ubuntu --sudo
+# Run with: run -svv playenv
 ---
 - hosts: ec2Instance
   vars:
@@ -11,6 +11,8 @@
   - repo_version: master
   - pvm: /home/$user/pvm
   - play_version: $ENV(ANSIBLE_PLAY_VERSION)
+  - project_version: $ENV(ANSIBLE_PLAY_APP_VERSION)
+  - project: $ENV(ANSIBLE_PLAY_APP_NAME)-$project_version
 
   tasks:
    - name: Install Unzip
@@ -18,12 +20,6 @@
 
    - name: Install Git
      action: apt pkg=git state=latest install_recommends=yes    
-
-   - name: Install Authbind
-     action: apt pkg=authbind state=latest install_recommends=yes    
-
-   - name: Configure Authbind
-     action: copy content="" dest=/etc/authbind/byport/80 owner=$user group=$group mode=0500 
  
    - name: Remove old PVM checkouts
      action: file path=${pvm} state=absent
@@ -55,8 +51,11 @@
    - name: Set Java 7 Env
      action: apt pkg=oracle-java7-set-default state=latest install_recommends=yes
 
-   - name: Allow any user to create and delete PID files in /var/run
-     action: shell chmod 777 /var/run
-
    - name: Copy .bash_aliases
      action: copy src=bin/.bash_aliases dest=/home/$user/.bash_aliases owner=$user group=$user mode=0644
+
+   - name: Copy Play service wrapper and point it to the Play app launch script
+     action: copy src=../bin/remote/play dest=/etc/init.d/play force=yes
+
+   - name: Patch play service script
+     lineinfile: dest=/etc/init.d/play regexp=PLAY_APP_SCRIPT line='        $home/$project/bin/$ENV(ANSIBLE_PLAY_APP_NAME) \\\'

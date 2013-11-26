@@ -1,0 +1,36 @@
+PIDFILE=/var/run/play.pid
+
+start() {
+        echo "Starting Play"
+        PLAY_APP_SCRIPT \
+           -J-Dhttp.port=80 -J-server -J-Dpidfile.path=$PIDFILE \
+           -J-XX:+UseCompressedOops -J-XX:+PerfDisableSharedMem -mem 1024 &
+}
+
+stop() {
+        echo "Stopping Play"
+        kill -9 `cat $PIDFILE`
+}
+
+restart() {
+        stop
+        start
+}
+
+case "$1" in 
+  start)
+        start
+        ;;
+
+  stop)
+        stop
+        ;;
+
+  restart)
+        restart
+        ;;
+
+  *)
+        echo $"Usage: $0 {start|stop|restart}"
+        ;;
+esac

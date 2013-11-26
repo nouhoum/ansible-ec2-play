@@ -1,9 +1,10 @@
 # Ansible EC2 Play Framework
-This is a set of Ansible scripts to deploy Play 2.2+ projects in EC2 instances.
+This is a set of Ansible scripts to deploy Play 2.2+ web applications in EC2 instances.
+Play applications are run as a system service.
 Play 2.2 uses SBT 0.13, and has a different deploy directory, which is handled in this version.
 The EC2 instances should be 'small' or larger; 'micro' instances won't compile.
 
-This project uses EC2 instance IDs to reference EC2 instances, because their IP addresses and DNS names change on every restart - unless you have provisioned permanent IP addresses.
+This project uses EC2 instance IDs to reference EC2 instances, because their IP addresses and DNS names change on every restart unless you have provisioned permanent IP addresses.
 
 **WARNING: USE AT YOUR OWN RISK. NO WARRANTY, EXPRESS OR IMPLIED IS PROVIDED.**
 
@@ -50,10 +51,10 @@ Make a copy of that file and save as `bin/custom` before modifying.
 The following scripts are available in the `yaml` directory:
 
 * `bootstrap`: secures an EC2 Ubuntu AMI. Requires `sudo`.
-* `playenv`: sets play dependencies (pvm, java) including Authbind so Play can use port 80 without root privileges. Requires `sudo`.
+* `playenv`: sets play dependencies (pvm, java). Requires `sudo`.
+* `service`: defines system service for play application. Requires `sudo`.
 * `deploy`: clones a Play project from a Git repository and deploys it on the machine. `sudo` is not required.
 * `launch`: Launches the deployed app, killing it first if necessary. `sudo` is not required.
-   [Authbind](http://en.wikipedia.org/wiki/Authbind) must be installed on the server so Play can run on port 80 without root privileges. 
 
 Run individual Ansible scripts this way:
 
@@ -67,6 +68,14 @@ You can also run all of the scripts in order this way:
 The `bin` directory contains miscellaneous utility scripts.
 
 ## Hints
+### System Service
+If you are logged into the remote server, you can start, restart and stop the Play application system service like this:
+
+    sudo service play start
+    sudo service play restart
+    sudo service play stop
+
+### Bash Aliases
 If you add the following to ~/.bash_aliases:
 
 ````
