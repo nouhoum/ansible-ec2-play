@@ -31,6 +31,7 @@ Where:
 | `-z string`  | [Availability Zone](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-regions-availability-zones.html); defaults to `us-east-1c` |
 
 **Example**
+
 Create a Ubuntu 13.10 micro image in the default availability zone with the default security group. 
 Define key pair `testKey` if it does not already exist.
 
