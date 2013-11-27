@@ -74,6 +74,28 @@ Where `scriptName` is one of the above Ansible scripts.
 | `-v`         | increments verbose output (can be specified up to 3 times)      |
 | `-x`         | Debug mode                                                      |
 
+### hosts.ini
+This file drives all of the Ansible scripts.
+It is automatically maintained through the scripts in the `bin/` directory.
+
+This file contains 3 sections: a section listing the EC2 instanceIDs of generic EC2 servers, 
+a section listing the EC2 instanceIDs of Play servers, 
+and a section listing the EC2 instanceIDs of Postgres servers.
+
+Note that each entry in the `playServers` and `postgresServers` sections should also appear in the `ec2Instances` section.
+
+````
+[ec2Instances]
+i-493cad31
+i-493cae73
+
+[playServers]
+i-493cad31
+
+[postgresServers]
+i-493cae73
+````
+
 ### provisionPlay
 The `provisionPlay` script runs all of the Ansible scripts necessary to provision Play on the EC2 instances with IDs listed in the `playServers` section in `hosts.ini`.
 Options are the same as for the `run` script above.
