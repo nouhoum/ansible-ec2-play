@@ -58,15 +58,12 @@ The following scripts are available in the `yaml` directory:
 | `playLaunch`  | Launches the deployed Play app, killing the previous instance first if necessary.                                       |
 | `postgresEnv` | Installs Postgres dependencies such as `pvm` and `java`. Use `psql` to restore the database before running `playLaunch` |
 
+**Usage**
 Run individual Ansible scripts on the hosts with IDs listed in `hostIds` like this (`-s` causes the script to run as superuser via `sudo`):
 
-    bin/run scriptName
+    bin/run [options] scriptName
 
-**Usage**
-
-    bin/run [options] script
-
-Where `script` is one of the above Ansible scripts.
+Where `scriptName` is one of the above Ansible scripts.
 
 **Options**
 
@@ -74,7 +71,6 @@ Where `script` is one of the above Ansible scripts.
 | ------------ | --------------------------------------------------------------- |
 | `-d`         | Dry run, shows commands that would be executed                  |
 | `-h`         | Display help                                                    |
-| `-j`         | Selects the host.ini section, defaults to ec2Instances          |
 | `-v`         | increments verbose output (can be specified up to 3 times)      |
 | `-x`         | Debug mode                                                      |
 
@@ -83,7 +79,7 @@ The `provisionPlay` script runs all of the Ansible scripts necessary to provisio
 Options are the same as for the `run` script above.
 
 ### provisionPostgres
-The `provisionPostgres` script runs all of the Ansible scripts necessary to provision Postgres on the EC2 instances with IDs listed in the 'postgresServers' section in `hosts.ini`.
+The `provisionPostgres` script runs all of the Ansible scripts necessary to provision Postgres on the EC2 instances with IDs listed in the `postgresServers` section in `hosts.ini`.
 Options are the same as for the `run` script above.
 
 ## Utility Scripts
@@ -113,3 +109,7 @@ Database servers should be provisioned before the application servers.
 * [The original source which inspired most of these scripts](https://github.com/phred/5minbootstrap)
 * [My first 5 minutes on a server](http://plusbryan.com/my-first-5-minutes-on-a-server-or-essential-security-for-linux-servers)
 * [A blog post that the author of the preceding article wrote](http://practicalops.com/my-first-5-minutes-on-a-server.html)
+
+## Sponsor
+This project is sponsored by [Micronautics Research](http://micronauticsresearch.com),
+developer of [ScalaCourses.com])(http://scalacourses.com)
