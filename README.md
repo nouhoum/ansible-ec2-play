@@ -57,7 +57,7 @@ The following scripts are available in the `yaml` directory:
 | `deploy`     | No  | Clones a Play project from a Git repository and deploys it on the machine. |
 | `launch`     | No  | Launches the deployed app, killing it first if necessary.                  |
 
-Run individual Ansible scripts like this (`-s` causes the script to run as superuser via sudo):
+Run individual Ansible scripts like this (`-s` causes the script to run as superuser via `sudo`):
 
     bin/run [-s] script_name
 
