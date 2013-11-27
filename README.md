@@ -95,12 +95,12 @@ If you are logged into the remote server, you can start, restart and stop the Pl
 ## Sample Session
 Database servers should be provisioned before the application servers.
 
-    # Create a Ubuntu 13.10 micro image in the default availability zone with the default security group. 
+    # Create a Ubuntu 13.10 micro image in the default availability zone with the default security group
     # Define key pair scalaCourses if it does not already exist.
     ec2Create scalaCoursesDB scalaCourses t1.micro ami-51274050
     provisionPostgres
 
-    # Create a Ubuntu 13.10 micro image in the default availability zone with the default security group. 
+    # Create a Ubuntu 13.10 micro image in the default availability zone with the default security group 
     # Use the scalaCourses key pair.
     ec2Create scalaCoursesPlay scalaCourses t1.micro ami-51274050
     provisionPlay
