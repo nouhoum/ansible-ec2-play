@@ -37,7 +37,37 @@ Define key pair `testKey` if it does not already exist.
 
     ec2Create testServer testKey t1.micro ami-51274050
 
-## ec2InstanceId 
+## ec2Delete
+Deletes one or more EC2 instance(s).
+Deleting instances multiple times will not cause an error.
+This operation takes several minutes, during which time `ec2Ids` will continue to show that the instance exists.
+You can track the progress of the deletion process by running ec2Status repeatedly.
+
+**Usage**
+
+    ec2Delete [options] instanceId...
+
+**Where**
+
+| Option        | Description                                                                                                               |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `instanceId`  | EC2 instance ID(s)                                                                                                        |
+
+**Options**
+
+| Option       | Description                                                     |
+| ------------ | --------------------------------------------------------------- |
+| `-d`         | Dry run, shows commands that would be executed                  |
+| `-h`         | Display help                                                    |
+| `-x`         | Debug mode                                                      |
+
+**Example**
+
+Do a dry run of deleting an EC2 instance.
+
+    ec2Delete -d i-7cf09e18
+
+## ec2InstanceId
 Given an EC2 domain name or IP address, returns the EC2 instance id.
 Domain name must be of the form: `ec2-54-196-57-227.compute-1.amazonaws.com`
 

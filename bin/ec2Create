@@ -18,11 +18,20 @@ function help {
   echo "  instanceId EC2 instance ID"
   echo "  keyPairName key pair name, which will be created and stored in the data/ directory if not already defined"
   echo "  classFQ is one of the instance type values documented here: http://aws.amazon.com/ec2/instance-types/#instance-details, for example: t1.micro"
-  echo "  amiId AMI image ID documented here: https://aws.amazon.com/marketplace/ref=mkt_ste_amis_redirect?b_k=291 and http://cloud-images.ubuntu.com/releases/13.10/release/, for example: ami-51274050"
+  echo "  amiId AMI image ID documented here: https://aws.amazon.com/marketplace/ref=mkt_ste_amis_redirect?b_k=291 and http://cloud-images.ubuntu.com/releases/13.10/release/, for example: ami-4b143122"
   echo ""
   echo "Example:"
-  echo "  $(basename $0) testServer testKey t1.micro ami-51274050 # creates Ubuntu 13.10 micro image"
+  echo "  $(basename $0) testServer testKey t1.micro ami-4b143122 # creates Ubuntu 13.10 micro image in us-east-1c"
   exit -1
+}
+
+exec 3>&1
+
+function DO {
+  if [ "$DRY" ]; then
+    echo "$@" >&3
+  fi
+  echo "$($@)"
 }
 
 AZ="--placement AvailabilityZone=us-east-1c"
@@ -61,7 +70,7 @@ KEY_NAMES="--key-names $KEY_PAIR_NAME"
 
 trap '' SIGTERM
 if [[ "$(aws ec2 describe-key-pairs $KEY_NAMES 2>&1)" == *"does not exist" ]]; then
-  aws ec2 create-key-pair --query KeyMaterial --output text $DRY $KEY_NAME $QUIET > data/$KEY_PAIR_NAME.pem
+  DO aws ec2 create-key-pair --query KeyMaterial --output text $DRY $KEY_NAME $QUIET > data/$KEY_PAIR_NAME.pem
 fi
 trap - SIGTERM
-aws ec2 run-instances $AMI_ID $AZ $COUNT $CLASS_FQ $DRY $KEY_NAME $OUTPUT $SECURITY_GROUP $QUIET
+DO aws ec2 run-instances $AMI_ID $AZ $COUNT $CLASS_FQ $DRY $KEY_NAME $OUTPUT $SECURITY_GROUP $QUIET
