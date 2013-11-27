@@ -49,13 +49,13 @@ Make a copy of that file and save as `bin/custom` before modifying.
 
 The following scripts are available in the `yaml` directory:
 
-| Name         | Requires sudo | Description                                                      |
-| ------------ | ------------- | ---------------------------------------------------------------- |
-|`bootstrap`   | Yes | secures an EC2 Ubuntu AMI.                                                 |
-| `playenv`    | Yes | Sets play dependencies (pvm, java).                                        |
-| `service`    | Yes | Defines system service for play application.                               |
-| `deploy`     | No  | Clones a Play project from a Git repository and deploys it on the machine. |
-| `launch`     | No  | Launches the deployed app, killing it first if necessary.                  |
+| Name         | Requires sudo | Description                                                        |
+| ------------ | ------------- | ------------------------------------------------------------------ |
+| `bootstrap`  | Yes | Sets up an EC2 Ubuntu AMI.                                                   |
+| `playenv`    | Yes | Installs play dependencies such as `pvm` and `java`.                         |
+| `service`    | Yes | Defines a system service for the Play application.                           |
+| `deploy`     | No  | Clones a Play project from a Git repository and deploys it on the machine.   |
+| `launch`     | No  | Launches the deployed app, killing the previous instance first if necessary. |
 
 Run individual Ansible scripts like this (`-s` causes the script to run as superuser via `sudo`):
 
@@ -74,7 +74,6 @@ If you are logged into the remote server, you can start, restart and stop the Pl
     sudo service play start
     sudo service play restart
     sudo service play stop
-
 
 ## References
 * [The original source which inspired most of these scripts](https://github.com/phred/5minbootstrap)
