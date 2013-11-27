@@ -22,7 +22,7 @@ This operation takes several minutes, during which time the database is not avai
 | `-r integer` | The number of days automated backups are retained               |
 | `-u string`  | Master database user name, set to master if not specified       |
 | `-x`         | Debug mode                                                      |
-| `-z string`  | [http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-regions-availability-zones.html](Availability Zone); defaults to `us-east-1c` |
+| `-z string`  | [Availability Zone](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-regions-availability-zones.html); defaults to `us-east-1c` |
 
 **Arguments**
 
