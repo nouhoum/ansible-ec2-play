@@ -1,0 +1,66 @@
+#!/bin/bash
+
+function help {
+  echo "Creates an EC2 server."
+  echo "This operation takes several seconds, during which time the server is not available."
+  echo -e "\nUsage: $(basename $0) [options] instanceId keyPairName classFQ amiId\n"
+  echo "Options are:"
+  echo "  -c         Count of instances to launch"
+  echo "  -d         Dry run - show command that would be executed"
+  echo "  -p string  Superuser password, set to blahblah if not specified"
+  echo "  -u string  Superuser name, set to devops if not specified"
+  echo "  -q         Quiet mode; suppress all output"
+  echo "  -s string  Security group"
+  echo "  -x         Debug mode"
+  echo "  -z string  Availability Zone; defaults to us-east-1c. See http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-regions-availability-zones.html"
+  echo -e "\nAnd:\n"
+  echo "  instanceId EC2 instance ID"
+  echo "  keyPairName key pair name, which will be created and stored in the data/ directory if not already defined"
+  echo "  classFQ is one of the instance type values documented here: http://aws.amazon.com/ec2/instance-types/#instance-details, for example: t1.micro"
+  echo "  amiId AMI image ID documented here: https://aws.amazon.com/marketplace/ref=mkt_ste_amis_redirect?b_k=291 and http://cloud-images.ubuntu.com/releases/13.10/release/, for example: ami-51274050"
+  echo ""
+  echo "Example:"
+  echo "  $(basename $0) testServer testKey t1.micro ami-51274050 # creates Ubuntu 13.10 micro image"
+  exit -1
+}
+
+AZ="--placement AvailabilityZone=us-east-1c"
+COUNT="--count 1"
+OUTPUT="--output json"
+PASSWORD="-p blahblah"
+USER="-u devops"
+USER_DATA="--user-data HowToUseThis"
+
+while getopts ":c:de:xp:qs:u:z:h?" opt; do
+  case $opt in
+    c) COUNT="--count $OPTARG"                    ;;
+    d) DRY="--dry-run"                            ;;
+    p) PASSWORD="-p $OPTARG"                      ;;
+    q) QUIET=true                                 ;;
+    s) SECURITY_GROUP="--security-groups $OPTARG" ;;
+    u) USER="-u $OPTARG"                          ;;
+    x) DEBUG=true                                 ;;
+    z) AZ="--placement AvailabilityZone=$OPTARG"  ;;
+    *) help                                       ;;
+  esac
+done
+shift $(($OPTIND-1))
+
+if [ $# -ne 4 ]; then help; fi
+
+if [ "$DEBUG" ]; then set -xv; fi
+
+INSTANCE_ID="$1"
+KEY_PAIR_NAME="$2"
+CLASS_FQ="--instance-type $3"
+AMI_ID="--image-id $4"
+
+KEY_NAME="--key-name $KEY_PAIR_NAME"
+KEY_NAMES="--key-names $KEY_PAIR_NAME"
+
+trap '' SIGTERM
+if [[ "$(aws ec2 describe-key-pairs $KEY_NAMES 2>&1)" == *"does not exist" ]]; then
+  aws ec2 create-key-pair --query KeyMaterial --output text $DRY $KEY_NAME $QUIET > data/$KEY_PAIR_NAME.pem
+fi
+trap - SIGTERM
+aws ec2 run-instances $AMI_ID $AZ $COUNT $CLASS_FQ $DRY $KEY_NAME $OUTPUT $SECURITY_GROUP $QUIET
