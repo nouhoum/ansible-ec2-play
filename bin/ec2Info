@@ -1,25 +1,36 @@
 #!/bin/bash
 
 function help {
-  echo "Given an EC2 instance id, return the IP address or domain name"
-  echo "Usage: $(basename $0) option i-7cf09e18"
-  echo "Where option is one of:"
-  echo "  -i return IP address"
-  echo "  -n return DNS name"
+  echo "Given an EC2 instance id, return the IP address, domain name or status"
+  echo -e "\nUsage: $(basename $0) [option] i-7cf09e18\n"
+  echo "Where options are:"
+  echo "Options are:"
+  echo "  -h  Display help"
+  echo "  -i  return IP address (no output if the instance is stopped)"
+  echo "  -n  return DNS name (no output if the instance is stopped)"
+  echo "  -s  return status (running or stopped)"
+  echo "  -x  Debug mode"
   exit -1
+}
+
+function parseJson {
+  python -c "import sys, json; print json.load(sys.stdin)[$1]" $2
 }
 
 if [ $# == 0 ] || [ $# -gt 2 ]; then help; fi
 
 INFO=PublicIpAddress
-while getopts "dinh?" opt; do
+while getopts "insxh?" opt; do
   case $opt in
-    d) set -xv ;;
-    i) ;;
+    i)                    ;;
     n) INFO=PublicDnsName ;;
-    *) help ;;
+    s) STATUS=true         ;;
+    x) DEBUG=true         ;;
+    *) help               ;;
   esac
 done
 shift $(($OPTIND-1))
 
-aws ec2 describe-instances --filters Name=instance-id,Values=$1 | grep "$INFO" | cut -d'"' -f4
+XML=`aws ec2 describe-instances --filters Name=instance-id,Values=$1`
+if [ "$DEBUG" ]; then set -xv; fi
+echo "$XML" | grep "$INFO" | cut -d'"' -f4

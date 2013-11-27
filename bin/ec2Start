@@ -1,0 +1,22 @@
+#!/bin/bash
+
+function help {
+  echo "Starts the EC2 instance with the specified instanceId."
+  echo -e "\nUsage: $(basename $0) [options] instanceId\n"
+  echo "Options are:"
+  echo "  -x  Debug mode"
+  echo "  -h  Display help"
+  exit -1
+}
+
+while getopts "xh?" opt; do
+  case $opt in
+    x) DEBUG=true ;;
+    *) help       ;;
+  esac
+done
+shift $(($OPTIND-1))
+
+if [ $# -ne 1 ]; then help; fi
+
+aws ec2 start-instances --instance-ids $1

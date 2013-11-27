@@ -1,0 +1,24 @@
+#!/bin/bash
+
+function help {
+  echo "Displays the DBInstanceIdentifier for each database owned by this account"
+  echo -e "\nUsage: $(basename $0) [options]\n"
+  echo "Options are:"
+  echo "  -h  Display help"
+  echo "  -x  Debug mode"
+  exit -1
+}
+
+while getopts "xh?" opt; do
+  case $opt in
+    x) DEBUG=true ;;
+    *) help       ;;
+  esac
+done
+shift $(($OPTIND-1))
+
+if [ "$#" -ne 0 ]; then help; fi
+
+XML="$(rds-describe-db-instances --show-xml)"
+if [ "$DEBUG" ]; then set -xv; fi
+echo "$XML" | grep -Po "<DBInstanceIdentifier>\K.*(?=</DBInstanceIdentifier>)"

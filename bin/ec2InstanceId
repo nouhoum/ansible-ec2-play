@@ -1,10 +1,34 @@
 #!/bin/bash
-# Given an EC2 domain name or IP address, returns the EC2 instance id
-# Domain name must be of the form: ec2-54-196-57-227.compute-1.amazonaws.com
 
-# Sample usage:
-# aws ec2 stop-instances --instance-ids `ec2InstanceId ec2-54-196-57-227.compute-1.amazonaws.com`
-# aws ec2 start-instances --instance-ids `ec2InstanceId ec2-54-196-57-227.compute-1.amazonaws.com`
+function help {
+  echo "Given an EC2 domain name or IP address, returns the EC2 instance id."
+  echo "Domain name must be of the form: ec2-54-196-57-227.compute-1.amazonaws.com"
+  echo -e "\nUsage: $(basename $0) [options] id\n"
+  echo "Options are:"
+  echo "  -h  Display help"
+  echo "  -i  return IP address"
+  echo "  -n  return DNS name"
+  echo "  -x  Debug mode"
+  echo ""
+  echo "Examples:"
+  echo "$(basename $0) i-7cf09e18"
+  echo "aws ec2 stop-instances --instance-ids `ec2InstanceId ec2-54-196-57-227.compute-1.amazonaws.com`"
+  echo "aws ec2 start-instances --instance-ids `ec2InstanceId ec2-54-196-57-227.compute-1.amazonaws.com`"
+  exit -1
+}
+
+if [ $# == 0 ] || [ $# -gt 2 ]; then help; fi
+
+INFO=PublicIpAddress
+while getopts "dinh?" opt; do
+  case $opt in
+    d) set -xv ;;
+    i) ;;
+    n) INFO=PublicDnsName ;;
+    *) help ;;
+  esac
+done
+shift $(($OPTIND-1))
 
 if [[ "$1" == *.amazonaws.com ]]; then
   FILTER_NAME=dns-name

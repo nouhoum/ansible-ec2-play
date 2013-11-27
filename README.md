@@ -65,31 +65,15 @@ You can also run all of the scripts in order this way:
     bin/runAll
 
 ## Utility Scripts
-The `bin` directory contains miscellaneous utility scripts.
+The `bin` directory contains [EC2](EC2.md) and [RDS](RDS.md) utility scripts.
 
-## Hints
-### System Service
+## System Service
 If you are logged into the remote server, you can start, restart and stop the Play application system service like this:
 
     sudo service play start
     sudo service play restart
     sudo service play stop
 
-### Bash Aliases
-If you add the following to `~/.bash_aliases`:
-
-````
-alias ec2stop="aws ec2 stop-instances --instance-ids"
-alias ec2start="aws ec2 start-instances --instance-ids"
-````
-
-... then you can start and stop EC2 instances by mentioning their instance IDs, like this:
-
-
-````
-ec2start i-7cf09e18
-ec2stop i-7cf09e18
-````
 
 ## References
 * [The original source which inspired most of these scripts](https://github.com/phred/5minbootstrap)

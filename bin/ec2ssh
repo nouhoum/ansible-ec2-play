@@ -2,12 +2,20 @@
 DIR="$( cd "$( dirname "${bash_source[0]}" )" && pwd )"
 
 function help {
-  echo "Log into EC2 instance by specifying host id instead of IP address or dns name"
-  echo "Usage: $(basename $0) ec2HostId"
+  echo "Log into EC2 instance by specifying a host id instead of IP address or dns name."
+  echo -e "\nUsage: $(basename $0) ec2HostId\n"
   exit -1
 }
 
-if [ $# -eq 0 ] || [ $# -gt 1 ]; then help; fi
+while getopts "dh?" opt; do
+  case $opt in
+    d) set -xv ;;
+    *) help ;;
+  esac
+done
+shift $(($OPTIND-1))
+
+if [ $# -ne 1 ]; then help; fi
 
 source custom
 
