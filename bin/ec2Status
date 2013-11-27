@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import os
+import subprocess
 import simplejson as json
 import sys
 
@@ -9,7 +10,7 @@ def help():
 
 Usage: %s instanceId
 
-Returned values are: pending, running, stopping and stopped''' % os.path.basename(sys.argv[0]))
+Returned values are: pending, running, stopping, stopped and terminated''' % os.path.basename(sys.argv[0]))
 
 if len(sys.argv)!=2:
   help()

@@ -1,7 +1,8 @@
 # EC2 Utilities
 
 ## ec2Create
-Creates an EC2 instance and key pair if required
+Creates an EC2 instance and key pair if required.
+The ID of the new EC2 instance is automatically added to `hostIds`.
 
 **Usage**
 
@@ -42,6 +43,7 @@ Deletes one or more EC2 instance(s).
 Deleting instances multiple times will not cause an error.
 This operation takes several minutes, during which time `ec2Ids` will continue to show that the instance(s) exist.
 You can track the progress of the deletion process by running the `ec2Status` command repeatedly.
+IDs of deleted EC2 instances are automatically removed from `hostIds`.
 
 **Usage**
 
@@ -150,7 +152,7 @@ aws ec2 start-instances --instance-ids
 
 ## ec2Status
 Returns the run status of the EC2 instance with the specified `instanceId`.
-Values returned are: `pending`, `running`, `stopping` and `stopped`
+Values returned are: `pending`, `running`, `stopping`, `stopped` and `terminated`.
 
 **Usage**
 
