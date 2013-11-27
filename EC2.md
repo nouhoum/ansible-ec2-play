@@ -1,5 +1,66 @@
 # EC2 Utilities
 
+## ec2Create
+Creates an EC2 instance and key pair if required
+
+**Usage**
+
+    ec2Create [options] instanceId keyPairName classFQ amiId
+
+Where:
+
+| Option       | Description                                                     |
+| ------------ | --------------------------------------------------------------- |
+| instanceId   | EC2 instance ID                                                 |
+| keyPairName  | key pair name, which will be created and stored in the data/ directory if not already defined |
+| classFQ      | is one of the [http://aws.amazon.com/ec2/instance-types/#instance-details](instance type values), for example: `t1.micro` |
+| amiId        | AMI image ID listed in [https://aws.amazon.com/marketplace/ref=mkt_ste_amis_redirect?b_k=291](general images) and [http://cloud-images.ubuntu.com/releases/13.10/release/](Ubuntu images), for example: ami-51274050 |
+
+**Options**
+
+| Option       | Description                                                     |
+| ------------ | --------------------------------------------------------------- |
+| -c           | Count of instances to launch                                    |
+| -d           | Dry run - show command that would be executed                   |
+| -h           | Display help                                                    |
+| -p string    | Superuser password, set to blahblah if not specified            |
+| -q           | Quiet mode; suppress all output                                 |
+| -s string    | Security group                                                  |
+| -u string    | Superuser name, set to devops if not specified                  |
+| -x           | Debug mode                                                      |
+| -z string    | Availability Zone; defaults to us-east-1c. See [http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-regions-availability-zones.html](docs) |
+
+**Example**
+Create a Ubuntu 13.10 micro image in the default availability zone with the default security group. 
+Define key pair `testKey` if it does not already exist.
+
+    ec2Create testServer testKey t1.micro ami-51274050
+
+## ec2InstanceId 
+Given an EC2 domain name or IP address, returns the EC2 instance id.
+Domain name must be of the form: ec2-54-196-57-227.compute-1.amazonaws.com
+
+**Usage**
+
+    ec2InstanceId [options] id
+
+**Options**
+
+| Option       | Description                                                     |
+| ------------ | --------------------------------------------------------------- |
+| -h           | Display help                                                    |
+| -i           | return IP address                                               |
+| -n           | return DNS name                                                 |
+| -x           | Debug mode                                                      |
+
+**Examples**
+
+````
+ec2InstanceId i-7cf09e18
+aws ec2 stop-instances --instance-ids 
+aws ec2 start-instances --instance-ids 
+````
+
 ## ec2Ids
 Displays all EC2 instance ids for this AWS account.
 
