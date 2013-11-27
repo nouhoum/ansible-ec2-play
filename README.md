@@ -112,4 +112,4 @@ Database servers should be provisioned before the application servers.
 
 ## Sponsor
 This project is sponsored by [Micronautics Research](http://micronauticsresearch.com),
-developer of [ScalaCourses.com])(http://scalacourses.com)
+developer of [ScalaCourses.com](http://scalacourses.com)
