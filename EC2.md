@@ -9,26 +9,26 @@ Creates an EC2 instance and key pair if required
 
 Where:
 
-| Option       | Description                                                     |
-| ------------ | --------------------------------------------------------------- |
-| instanceId   | EC2 instance ID                                                 |
-| keyPairName  | key pair name, which will be created and stored in the data/ directory if not already defined |
-| classFQ      | is one of the [http://aws.amazon.com/ec2/instance-types/#instance-details](instance type values), for example: `t1.micro` |
-| amiId        | AMI image ID listed in [https://aws.amazon.com/marketplace/ref=mkt_ste_amis_redirect?b_k=291](general images) and [http://cloud-images.ubuntu.com/releases/13.10/release/](Ubuntu images), for example: ami-51274050 |
+| Option        | Description                                                                                                               |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `instanceId`  | EC2 instance ID                                                                                                           |
+| `keyPairName` | key pair name, which will be created and stored in the `data/` directory if not already defined                           |
+| `classFQ`     | is one of the [instance type values](http://aws.amazon.com/ec2/instance-types/#instance-details), for example: `t1.micro` |
+| `amiId`       | AMI image ID listed in [general images](https://aws.amazon.com/marketplace/ref=mkt_ste_amis_redirect?b_k=291) and [Ubuntu images](http://cloud-images.ubuntu.com/releases/13.10/release/), for example: `ami-51274050` |
 
 **Options**
 
 | Option       | Description                                                     |
 | ------------ | --------------------------------------------------------------- |
-| -c           | Count of instances to launch                                    |
-| -d           | Dry run - show command that would be executed                   |
-| -h           | Display help                                                    |
-| -p string    | Superuser password, set to blahblah if not specified            |
-| -q           | Quiet mode; suppress all output                                 |
-| -s string    | Security group                                                  |
-| -u string    | Superuser name, set to devops if not specified                  |
-| -x           | Debug mode                                                      |
-| -z string    | Availability Zone; defaults to us-east-1c. See [http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-regions-availability-zones.html](docs) |
+| `-c`         | Count of instances to launch                                    |
+| `-d`         | Dry run, shows commands that would be executed                  |
+| `-h`         | Display help                                                    |
+| `-p string`  | Superuser password, set to `blahblah` if not specified          |
+| `-q`         | Quiet mode; suppress all output                                 |
+| `-s string`  | Security group                                                  |
+| `-u string`  | Superuser name, set to `devops` if not specified                |
+| `-x`         | Debug mode                                                      |
+| `-z string`  | [http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-regions-availability-zones.html](Availability Zone); defaults to us-east-1c |
 
 **Example**
 Create a Ubuntu 13.10 micro image in the default availability zone with the default security group. 
@@ -48,10 +48,10 @@ Domain name must be of the form: ec2-54-196-57-227.compute-1.amazonaws.com
 
 | Option       | Description                                                     |
 | ------------ | --------------------------------------------------------------- |
-| -h           | Display help                                                    |
-| -i           | return IP address                                               |
-| -n           | return DNS name                                                 |
-| -x           | Debug mode                                                      |
+| `-h`         | Display help                                                    |
+| `-i`         | return IP address                                               |
+| `-n`         | return DNS name                                                 |
+| `-x`         | Debug mode                                                      |
 
 **Examples**
 
@@ -72,8 +72,8 @@ Displays all EC2 instance ids for this AWS account.
 
 | Option       | Description                                                     |
 | ------------ | --------------------------------------------------------------- |
-| -h           | Display help                                                    |
-| -x           | Debug mode                                                      |
+| `-h`         | Display help                                                    |
+| `-x`         | Debug mode                                                      |
 
 ## ec2Info
 Given an EC2 instance id, return the IP address, domain name or status
@@ -86,11 +86,11 @@ Given an EC2 instance id, return the IP address, domain name or status
 
 | Option       | Description                                                     |
 | ------------ | --------------------------------------------------------------- |
-| -h           | Display help                                                    |
-| -i           | return IP address (no output if the instance is stopped)        |
-| -n           | return DNS name (no output if the instance is stopped)          |
-| -s           | return status (running or stopped)                              |
-| -x           | Debug mode                                                      |
+| `-h`         | Display help                                                    |
+| `-i`         | return IP address (no output if the instance is stopped)        |
+| `-n`         | return DNS name (no output if the instance is stopped)          |
+| `-s`         | return status (running or stopped)                              |
+| `-x`         | Debug mode                                                      |
 
 ## ec2InstanceId 
 Given an EC2 domain name or IP address, returns the EC2 instance id.
@@ -104,10 +104,10 @@ Domain name must be of the form: ec2-54-196-57-227.compute-1.amazonaws.com
 
 | Option       | Description                                                     |
 | ------------ | --------------------------------------------------------------- |
-| -h           | Display help                                                    |
-| -i           | return IP address                                               |
-| -n           | return DNS name                                                 |
-| -x           | Debug mode                                                      |
+| `-h`         | Display help                                                    |
+| `-i`         | return IP address                                               |
+| `-n`         | return DNS name                                                 |
+| `-x`         | Debug mode                                                      |
 
 **Examples**
 
@@ -136,8 +136,8 @@ Starts the EC2 instance with the specified instanceId.
 
 | Option       | Description                                                     |
 | ------------ | --------------------------------------------------------------- |
-| -h           | Display help                                                    |
-| -x           | Debug mode                                                      |
+| `-h`         | Display help                                                    |
+| `-x`         | Debug mode                                                      |
 
 ## ec2Stop
 Stops the EC2 instance with the specified instanceId.
@@ -150,5 +150,5 @@ Stops the EC2 instance with the specified instanceId.
 
 | Option       | Description                                                     |
 | ------------ | --------------------------------------------------------------- |
-| -h           | Display help                                                    |
-| -x           | Debug mode                                                      |
+| `-h`         | Display help                                                    |
+| `-x`         | Debug mode                                                      |
