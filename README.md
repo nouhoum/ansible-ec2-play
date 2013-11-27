@@ -1,8 +1,7 @@
 # Ansible EC2 Play Framework
 This is a set of Ansible scripts to deploy Play 2.2+ web applications in EC2 instances.
-Play applications are run as a system service.
-Play 2.2 uses SBT 0.13, and has a different deploy directory, which is handled in this version.
 The EC2 instances should be 'small' or larger; 'micro' instances won't compile.
+Play applications are run as a system service.
 
 This project uses EC2 instance IDs to reference EC2 instances, because their IP addresses and DNS names change on every restart unless you have provisioned permanent IP addresses.
 
@@ -50,11 +49,13 @@ Make a copy of that file and save as `bin/custom` before modifying.
 
 The following scripts are available in the `yaml` directory:
 
-* `bootstrap`: secures an EC2 Ubuntu AMI. Requires `sudo`.
-* `playenv`: sets play dependencies (pvm, java). Requires `sudo`.
-* `service`: defines system service for play application. Requires `sudo`.
-* `deploy`: clones a Play project from a Git repository and deploys it on the machine. `sudo` is not required.
-* `launch`: Launches the deployed app, killing it first if necessary. `sudo` is not required.
+| Name         | Requires sudo | Description                                                      |
+| ------------ | ------------- | ---------------------------------------------------------------- |
+|`bootstrap`   | Yes | secures an EC2 Ubuntu AMI.                                                 |
+| `playenv`    | Yes | Sets play dependencies (pvm, java).                                        |
+| `service`    | Yes | Defines system service for play application.                               |
+| `deploy`     | No  | Clones a Play project from a Git repository and deploys it on the machine. |
+| `launch`     | No  | Launches the deployed app, killing it first if necessary.                  |
 
 Run individual Ansible scripts this way:
 
