@@ -39,7 +39,7 @@ Define key pair `testKey` if it does not already exist.
 
 ## ec2InstanceId 
 Given an EC2 domain name or IP address, returns the EC2 instance id.
-Domain name must be of the form: ec2-54-196-57-227.compute-1.amazonaws.com
+Domain name must be of the form: `ec2-54-196-57-227.compute-1.amazonaws.com`
 
 **Usage**
 
@@ -95,7 +95,7 @@ Given an EC2 instance id, return the IP address, domain name or status
 
 ## ec2InstanceId 
 Given an EC2 domain name or IP address, returns the EC2 instance id.
-Domain name must be of the form: ec2-54-196-57-227.compute-1.amazonaws.com
+Domain name must be of the form: `ec2-54-196-57-227.compute-1.amazonaws.com`
 
 **Usage**
 
@@ -119,7 +119,7 @@ aws ec2 start-instances --instance-ids
 ````
 
 ## ec2Status
-Returns the run status of the EC2 instance with the specified instanceId.
+Returns the run status of the EC2 instance with the specified `instanceId`.
 Values returned are: `pending`, `running`, `stopping` and `stopped`
 
 **Usage**
@@ -127,7 +127,7 @@ Values returned are: `pending`, `running`, `stopping` and `stopped`
     ec2Status instanceId
 
 ## ec2Start
-Starts the EC2 instance with the specified instanceId.
+Starts the EC2 instance with the specified `instanceId`.
 
 **Usage**
 
@@ -141,7 +141,7 @@ Starts the EC2 instance with the specified instanceId.
 | `-x`         | Debug mode                                                      |
 
 ## ec2Stop
-Stops the EC2 instance with the specified instanceId.
+Stops the EC2 instance with the specified `instanceId`.
 
 **Usage**
 
