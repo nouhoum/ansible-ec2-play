@@ -40,8 +40,8 @@ Define key pair `testKey` if it does not already exist.
 ## ec2Delete
 Deletes one or more EC2 instance(s).
 Deleting instances multiple times will not cause an error.
-This operation takes several minutes, during which time `ec2Ids` will continue to show that the instance exists.
-You can track the progress of the deletion process by running ec2Status repeatedly.
+This operation takes several minutes, during which time `ec2Ids` will continue to show that the instance(s) exist.
+You can track the progress of the deletion process by running the `ec2Status` command repeatedly.
 
 **Usage**
 
@@ -51,7 +51,7 @@ You can track the progress of the deletion process by running ec2Status repeated
 
 | Option        | Description                                                                                                               |
 | ------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| `instanceId`  | EC2 instance ID(s)                                                                                                        |
+| `instanceId`  | EC2 instance ID(s). Separate multiple instance IDs with spaces.                                                           |
 
 **Options**
 
