@@ -2,14 +2,17 @@
 
 function help {
   echo "Execute an Ansible script as the current user or superuser"
-  echo "Usage: $(basename $0) options script"
-  echo "Where: "
-  echo "  options can include:"
+  echo -e "\nUsage: $(basename $0) [options]\n"
+  echo "Options can include:"
   echo "    -d causes the script to be dry run"
-  echo "    -s causes the script to be run as superuser"
-  echo "    -t enables trace output"
+  echo "    -h Display help information"
+  echo "    -j selects the host.ini section, defaults to ec2Instances"
   echo "    -v increments verbose output (can be specified up to 3 times)"
-  echo "  script is one of bootstrap, playenv or deploy"
+  echo "    -x debug mode"
+  SCRIPTS="$(cd yaml; for s in *.yaml; do echo -n "$COMMA ${s:0:${#s} - 5}"; COMMA=","; done)"
+  echo ""
+  echo "Where:"
+  echo "  script is one of $SCRIPTS"
   exit -1
 }
 
@@ -18,11 +21,12 @@ DIR="$( cd "$( dirname "${bash_source[0]}" )" && pwd )"
 cd $DIR
 
 verbose=""
-while getopts "dhstv?" opt; do
+export HOST_INI_SECTION="ec2Instances"
+while getopts "dhj:stvx?" opt; do
   case $opt in
     d ) DRYRUN="--check" ;;
     h ) help ;;
-    s ) SUDO="--sudo" ;;
+    j ) export HOST_INI_SECTION="$OPTARG" ;;
     t ) TRACE="set -xv" ;;
     v ) verbose="-v $verbose" ;;
     \?) help ;;
@@ -32,9 +36,7 @@ shift $(($OPTIND-1))
 
 if [ -z "$1" ]; then help; fi
 
-if [ "$verbose" ]; then
-  echo "Running from $(pwd)"
-fi
+if [ "$verbose" ]; then echo "Running from $(pwd)"; fi
 
 if [ -f bin/custom ]; then
   source bin/custom
@@ -47,4 +49,4 @@ else
 fi
 
 $TRACE
-ansible-playbook $DRYRUN $verbose -i hosts.ini yaml/$1.yaml -u ubuntu $SUDO
+ansible-playbook $DRYRUN $verbose -i hosts.ini yaml/$1.yaml -u ubuntu

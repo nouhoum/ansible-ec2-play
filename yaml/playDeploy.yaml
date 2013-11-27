@@ -1,9 +1,9 @@
 # Clones and builds the application on the server.
 # Assumes a working Play deployment (via pvm: https://github.com/kaiinkinen/pvm) and Git are available, such as performed by the playenv.yaml script.
 # WARNING: if your server has low memory (like a Micro EC2 instance) the build step may fail due to the OOM manager killing it. Enable swap or add more memory to the server.
-# Run with: run -vv deploy 
+# Run with: run -vv playDeploy 
 ---
-- hosts: ec2Instance
+- hosts: playServers
   vars:
   - ubuntu_release: $ENV(ANSIBLE_UBUNTU_RELEASE)
   - user: $ENV(ANSIBLE_USER_ID)

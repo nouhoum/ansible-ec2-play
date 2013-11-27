@@ -1,0 +1,45 @@
+#!/usr/bin/env python
+
+import ConfigParser
+import os
+import sys
+
+def help():
+  sys.exit('''Adds or removes hostIds to/from a section in hosts.ini 
+
+Usage: %s action instanceId sectionNames 
+
+Where:
+  action is add or remove
+  instanceId EC2 instanceId
+  sectionNames is one or more of ec2Instances, playServers or postgresServers''' % os.path.basename(sys.argv[0]))
+
+if len(sys.argv)<3:
+  help()
+
+iniFile = 'hosts.ini'
+action = sys.argv[1]
+instanceId = sys.argv[2]
+sectionNames = sys.argv[3:]
+
+config = ConfigParser.RawConfigParser(allow_no_value=True)
+config.read(iniFile)
+
+for sectionName in sectionNames:
+  if sectionName not in ['ec2Instances', 'playServers', 'postgresServers']:
+    print("Error: {0} is an invalid sectionName\n".format(sectionName))
+    help()
+
+if action=='add':
+  for sectionName in sectionNames:
+    config.set(sectionName, instanceId)  
+elif action=='remove':
+  for sectionName in sectionNames:
+    if config.has_option(sectionName, instanceId):
+      config.remove_option(sectionName, instanceId)
+else:
+  printf("{0} is an invalid action".format(action))
+  help()
+
+with open(iniFile, 'wb') as configfile:
+  config.write(configfile)

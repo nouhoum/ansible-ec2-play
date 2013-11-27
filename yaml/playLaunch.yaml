@@ -1,0 +1,15 @@
+# Runs a Play 2 application, built using playDeploy.yaml
+# Run with: run -vv playLaunch
+---
+- hosts: playServers
+  vars:
+  - java_opts: $ENV(JAVA_OPTS)
+
+  tasks:
+   # Help on Play app options: ${home}/$project/bin/$ENV(ANSIBLE_PLAY_APP_NAME)-h
+   # See http://www.playframework.com/documentation/2.2.1/ProductionConfiguration
+   - name: Launch project
+     service: name=play state=restarted
+
+   #- name: tail
+   #  action: shell tail -f $home/nohup.out

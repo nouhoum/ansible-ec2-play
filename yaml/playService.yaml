@@ -1,8 +1,9 @@
 # Defines a system service for the Play application.
-# Assumes a working Play deployment (via pvm: https://github.com/kaiinkinen/pvm) and Git are available, such as performed by the playenv.yaml script.
-# Run with: run -svv service
+# Assumes a working Play deployment (via pvm: https://github.com/kaiinkinen/pvm) and Git are available, such as performed by the playEnv.yaml script.
+# Run with: run -vv playService
 ---
-- hosts: ec2Instance
+- hosts: playServers
+  sudo: yes
   vars:
   - ubuntu_release: $ENV(ANSIBLE_UBUNTU_RELEASE)
   - user: $ENV(ANSIBLE_USER_ID)

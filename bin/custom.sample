@@ -1,4 +1,7 @@
 export ANSIBLE_LOGWATCH_EMAIL=santa@gmail.com
+export ANSIBLE_DB_NAME=my_database
+export ANSIBLE_DB_USER=master
+export ANSIBLE_DB_PASSWORD=blahblah
 export ANSIBLE_PLAY_VERSION=2.2.1
 export ANSIBLE_PLAY_APP_NAME=myapp
 export ANSIBLE_PLAY_APP_VERSION=0.1.0

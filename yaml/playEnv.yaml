@@ -1,7 +1,8 @@
 # Sets the Play environment in the server
-# Run with: run -svv playenv
+# Run with: run -vv playEnv
 ---
-- hosts: ec2Instance
+- hosts: playServers
+  sudo: yes
   vars:
   - ubuntu_release: $ENV(ANSIBLE_UBUNTU_RELEASE)
   - user: $ENV(ANSIBLE_USER_ID)

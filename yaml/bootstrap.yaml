@@ -1,8 +1,9 @@
-# Run with: run -svv bootstrap
+# Run with: run -vv bootstrap
 # More details on steps to secure at: http://www.thefanclub.co.za/how-to/how-secure-ubuntu-1204-lts-server-part-1-basics 
 # Remember to run: ufw enable after rebooting
 ---
-- hosts: ec2Instance
+- hosts: ec2Instances
+  sudo: yes
   vars:
   - ubuntu_release: $ENV(ANSIBLE_UBUNTU_RELEASE)
   - logwatch_email: $ENV(ANSIBLE_LOGWATCH_EMAIL)
