@@ -1,18 +1,22 @@
 #!/usr/bin/env python
 
-import subprocess
-import sys
+import os
 import simplejson as json
+import sys
 
-# Returns pending, running, stopping, stopped
+def help():
+  sys.exit('''Returns the run status of the EC2 instance with the specified instanceId.
+
+Usage: %s instanceId
+
+Returned values are: pending, running, stopping and stopped''' % os.path.basename(sys.argv[0]))
 
 if len(sys.argv)!=2:
-  sys.exit('Usage: %s instanceId' % sys.argv[0])
+  help()
 
 instanceId = sys.argv[1]
 p = subprocess.Popen("aws ec2 describe-instances --instance-ids {0}".format(instanceId), stdout=subprocess.PIPE, shell=True)
 (output, err) = p.communicate()
-#print output
 reservations = json.loads(output)['Reservations']
 for reservation in reservations:
   for instance in reservation['Instances']:
