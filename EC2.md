@@ -56,6 +56,14 @@ aws ec2 stop-instances --instance-ids
 aws ec2 start-instances --instance-ids 
 ````
 
+## ec2Status
+Returns the run status of the EC2 instance with the specified instanceId.
+Values returned are: `pending`, `running`, `stopping` and `stopped`
+
+**Usage**
+
+    ec2Status instanceId
+
 ## ec2Start
 Starts the EC2 instance with the specified instanceId.
 
