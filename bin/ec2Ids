@@ -27,5 +27,5 @@ if [ "$DEBUG" ]; then set -xv; fi
 if [ "$GROUP" ]; then
   hosts list $GROUP
 else
-  aws ec2 describe-instances | grep "InstanceId" | cut -d'"' -f4
+  aws ec2 describe-instances --filter Name=instance-state-name,Values=pending,running,shutting-down,stopping,stopped | grep "InstanceId" | cut -d'"' -f4
 fi

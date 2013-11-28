@@ -29,27 +29,28 @@ Where:
 | `-q`         | Quiet mode; suppress all output                                 |
 | `-s string`  | Security group                                                  |
 | `-u string`  | Superuser name, set to `devops` if not specified                |
+| `-w`         | Wait for the process to complete before returning               |
 | `-x`         | Debug mode                                                      |
 | `-z string`  | [Availability Zone](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-regions-availability-zones.html); defaults to `us-east-1c` |
 
 **Examples**
 
-Create a generic Ubuntu 13.10 micro image in the default availability zone with the default security group. 
+Create a generic Ubuntu 13.10 micro image in the default availability zone with the default security group, and wait for the process to complete before returning. 
 Define key pair `testKey` if it does not already exist.
 
-    ec2Create testServer testKey t1.micro ami-51274050
+    ec2Create -w testServer testKey t1.micro ami-51274050
 
-Create a Play server using Ubuntu 13.10 micro image in `us-east-1c`:
+Create a Play server using Ubuntu 13.10 micro image in `us-east-1c`, and wait for the process to complete before returning:
 
-    ec2Create testServer testKey t1.micro ami-4b143122 playServers
+    ec2Create -w testServer testKey t1.micro ami-4b143122 playServers
 
-Create a Postgres server using Ubuntu 13.10 micro image in `us-east-1c`:
+Create a Postgres server using Ubuntu 13.10 micro image in `us-east-1c`, and wait for the process to complete before returning:
 
-    ec2Create testServer testKey t1.micro ami-4b143122 postgresServers
+    ec2Create -w testServer testKey t1.micro ami-4b143122 postgresServers
 
-Create a server with Play and Postgres using Ubuntu 13.10 micro image in `us-east-1c`:
+Create a server with Play and Postgres using Ubuntu 13.10 micro image in `us-east-1c`, and wait for the process to complete before returning:
 
-    ec2Create testServer testKey t1.micro ami-4b143122 playServers postgresServers
+    ec2Create -w testServer testKey t1.micro ami-4b143122 playServers postgresServers
 
 ## ec2Delete
 Deletes one or more EC2 instance(s).
@@ -116,10 +117,11 @@ Displays all EC2 instance ids for this AWS account.
 
 **Options**
 
-| Option       | Description                                                     |
-| ------------ | --------------------------------------------------------------- |
-| `-h`         | Display help                                                    |
-| `-x`         | Debug mode                                                      |
+| Option       | Description                                                                          |
+| ------------ | ------------------------------------------------------------------------------------ |
+| `-g group`   | Only show IDs for the specified group (ec2Instances, playServers or postgresServers) |
+| `-h`         | Display help                                                                         |
+| `-x`         | Debug mode                                                                           |
 
 ## ec2Info
 Given an EC2 instance id, return the IP address, domain name or status.

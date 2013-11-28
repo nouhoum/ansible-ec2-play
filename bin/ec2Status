@@ -6,23 +6,25 @@ import simplejson as json
 import sys
 
 def help():
-  sys.exit('''Returns the run status of the EC2 instance with the specified instanceId.
+  sys.exit('''Returns the run status of the EC2 instances with the specified instanceId.
 
-Usage: %s instanceId
+Usage: %s instanceIds
 
-Returned values are: pending, running, stopping, stopped and terminated''' % os.path.basename(sys.argv[0]))
+Returned values are: pending, running, shutting-down, stopping, stopped and terminated''' % os.path.basename(sys.argv[0]))
 
-if len(sys.argv)!=2:
+if len(sys.argv)<2:
   help()
 
-instanceId = sys.argv[1]
-try:
-  p = subprocess.Popen("aws ec2 describe-instances --instance-ids {0}".format(instanceId), stdout=subprocess.PIPE, shell=True)
-  (output, err) = p.communicate()
-  reservations = json.loads(output)['Reservations']
-except Exception as ex:
-  pass
-else:
-  for reservation in reservations:
-    for instance in reservation['Instances']:
-      print instance['State']['Name']
+for instanceId in sys.argv[1:]:
+  try:
+    p = subprocess.Popen("aws ec2 describe-instances --instance-ids {0}".format(instanceId), stdout=subprocess.PIPE, shell=True)
+    (output, err) = p.communicate()
+    reservations = json.loads(output)['Reservations']
+  except Exception as ex:
+    pass
+  else:
+    space = ""
+    for reservation in reservations:
+      for instance in reservation['Instances']:
+        print "%s%s" % (space, instance['State']['Name'])
+        space = " "

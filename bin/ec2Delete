@@ -2,13 +2,14 @@
 
 function help {
   echo "Deletes the specified ec2 instance(s)."
-  echo "This operation takes several minutes, during which time ec2Ids will continue to show that the instance exists."
+  echo "This operation takes several minutes."
   echo "You can track the progress of the deletion process by running ec2Status repeatedly."
   echo "Deleting instances multiple times will not cause an error."
   echo -e "\nUsage: $(basename $0) [options] instanceId(s)\n"
   echo "Options are:"
   echo "  -d  Dry run"
   echo "  -h  Display help"
+  echo "  -w  Wait until operation is complete before returning"
   echo "  -x  Debug mode"
   echo ""
   echo "Example:"
@@ -22,12 +23,20 @@ function DO {
   if [ "$DRY" ]; then
     echo "$@" >&3
   fi
-  echo "$($@)"
+  `$@` &> /dev/null
 }
 
-while getopts "dxh?" opt; do
+function WAIT_FOR_TERMINATION {
+  while [ "$(ec2Status $1)" != "terminated" ]; do
+    echo -n "."
+    sleep 5
+  done
+}
+
+while getopts "dxhw?" opt; do
   case $opt in
   	d) DRY="--dry-run" ;;
+    w) WAIT=true       ;;
     x) DEBUG=true      ;;
     *) help            ;;
   esac
@@ -36,7 +45,7 @@ shift $(($OPTIND-1))
 
 if [ "$#" -lt 1 ]; then help; fi
 
-CMD="aws ec2 terminate-instances $DRY --instance-ids $1"
+CMD="aws ec2 terminate-instances $DRY --instance-ids $@"
 if [ "$DEBUG" ]; then set -xv; fi
 DO $CMD
   
@@ -47,4 +56,12 @@ if [ -z "$DRY" ]; then  # Remove hostId from list of hostIds
   for x in $HOST_IDS; do 
     if [[ ! $@ =~ "$x" ]]; then echo "$x" >> hostIds; fi
   done
+
+  if [ "$WAIT" ]; then
+    for x in $@; do
+      echo -n "Deleting $x..."
+      WAIT_FOR_TERMINATION $x
+      echo " deleted."
+    done
+  fi
 fi

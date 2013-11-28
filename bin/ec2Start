@@ -4,14 +4,16 @@ function help {
   echo "Starts the EC2 instances with the specified instanceIds."
   echo -e "\nUsage: $(basename $0) [options] instanceIds\n"
   echo "Options are:"
-  echo "  -x  Debug mode"
   echo "  -h  Display help"
+  echo "  -w  Wait until operation is complete before returning"
+  echo "  -x  Debug mode"
   exit -1
 }
 
 while getopts "xh?" opt; do
   case $opt in
     x) DEBUG=true ;;
+    w) WAIT=true  ;;
     *) help       ;;
   esac
 done
@@ -20,3 +22,12 @@ shift $(($OPTIND-1))
 if [ $# -ne 1 ]; then help; fi
 
 aws ec2 start-instances --instance-ids $@
+
+if [ "$WAIT" ]; then
+  echo -n "Starting..." 
+  while [ "$(ec2Status $INSTANCE_ID)" != "running" ]; do
+    echo -n "."
+    sleep 5
+  done
+  echo " running."
+fi
