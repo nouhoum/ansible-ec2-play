@@ -68,7 +68,7 @@ The following scripts are available in the `yaml` directory:
 | `playService` | Defines a system service for the Play application.                                                                      |
 | `playDeploy`  | Clones a Play project from a Git repository and deploys it on the machine.                                              |
 | `playLaunch`  | Launches the deployed Play app, killing the previous instance first if necessary.                                       |
-| `postgresEnv` | Installs Postgres on a generic AWS EC2 instance, as an alternative to using an AWS RDS Postgres instance such as those created by `bin/rdsCreate`. Use `psql` to restore the database before running `playLaunch` |
+| `postgresEnv` | Installs Postgres on a generic AWS EC2 instance, as an alternative to using an AWS RDS Postgres instance such as those created by `bin/rdsCreate`. Use `bin/psql` to restore the database before running `playLaunch` |
 
 **Usage**
 
