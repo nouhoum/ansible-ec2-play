@@ -6,7 +6,7 @@ import subprocess as sub
 import sys
 
 def help():
-  sys.exit('''Adds, lists, or removes hostIds to/in/from section(s) in hosts.ini 
+  sys.exit('''Adds, lists, or removes hostIds to/in/from section(s) in hosts.ini. Can also silently update the *.domain sections from the *.ids sections.
 
 Usage: %s action [instanceId] sectionNames 
 

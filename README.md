@@ -106,7 +106,7 @@ This file contains 6 sections:
 Note that each entry in the `playServer.ids` and `postgresServer.ids` sections should also appear in the `ec2Instance.ids` section.
 Similarly, each entry in the `playServer.domains` and `postgresServer.domains` sections should also appear in the `ec2Instance.domains` section.
 
-The `bin/hostIni` command updates the three `*.domain` sections from the corresponding `*.ids` sections, removes dead entries, and is automatically invoked by the `bin/` scripts when adding and deleting servers.
+The `bin/hosts` command updates the three `*.domain` sections from the corresponding `*.ids` sections, removes dead entries, and is automatically invoked by the `bin/` scripts when adding and deleting servers.
 
 ````
 [ec2Instances.ids]
@@ -129,6 +129,21 @@ i-8ae6adf1
 
 [postgresServers.domains]
 ````
+
+### hosts
+Command that adds, lists, or removes hostIds to/in/from section(s) in `hosts.ini`. 
+Can also silently update the `*.domain` sections from the `*.ids` sections.
+
+**Usage**
+
+    hosts action [instanceId] sectionNames 
+
+**Where**
+| Option         | Description                                                                                                               |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `action`       | One of `add`, `list`, `remove` or `update`. The `list` action also performs an `update`.                                  |
+| `instanceId`   | EC2 instanceId (not required if `action` is `list`)                                                                       |
+| `sectionNames` | is one or more of `ec2Instance`, `playServer` or `postgresServer`                                                         |
 
 ### provisionPlay
 The `bin/provisionPlay` script runs all of the Ansible scripts necessary to provision Play on the EC2 instances with IDs listed in the `playServers` section in `hosts.ini`.
