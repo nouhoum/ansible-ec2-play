@@ -11,7 +11,7 @@ def help():
 Usage: %s action [instanceId] sectionNames 
 
 Where:
-  action is add, list or remove
+  action is add, list, remove or update. The list action also performs an update.
   instanceId EC2 instanceId (not required if action is list)
   sectionNames is one or more of ec2Instance, playServer or postgresServer''' % os.path.basename(sys.argv[0]))
 
@@ -30,7 +30,7 @@ if len(sys.argv)<2:
 iniFile = 'hosts.ini'
 sectionNameList = ['ec2Instance', 'playServer', 'postgresServer']
 action = sys.argv[1]
-if action=='list':
+if action=='list' or action=='update':
   if len(sys.argv)<3:
     help()
   else:
@@ -57,11 +57,16 @@ if action=='add':
   for sectionName in sectionNames:
     config.set(sectionName + ".ids", instanceId)
     config.set(sectionName + ".domains", domain)
-elif action=='list':
+elif action=='list' or action=='update':
   for sectionName in sectionNames:
     space = ""
-    for option in config.options(sectionName + ".ids"):
-      print("{0}{1} {2}".format(option, space, domainName(option)))
+    config.remove_section(sectionName + ".domains")
+    config.add_section(sectionName + ".domains")
+    for instanceId in config.options(sectionName + ".ids"):
+      domain = domainName(instanceId)
+      config.set(sectionName + ".domains", domain)
+      if action=='list':
+        print("{0}{1} {2}".format(instanceId, space, domain))
       space = " "
 elif action=='remove':
   domain = domainName(instanceId)
