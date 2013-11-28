@@ -55,6 +55,31 @@ transport=ssh
 
 ## Bash Scripts
 The `bin` directory contains bash scripts for [EC2](EC2.md) and [RDS](RDS.md) operation, and also contains undocumented utility bash scripts.
+Generic scripts/commands are shown here.
+
+### hosts
+Command that adds, lists, or removes hostIds to/in/from section(s) in `hosts.ini`. 
+Can also silently update the `*.domain` sections from the `*.ids` sections.
+
+**Usage**
+
+    hosts action [instanceId] sectionNames 
+
+**Where**
+
+| Option         | Description                                                                                                               |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `action`       | One of `add`, `list`, `remove` or `update`. The `list` action also performs an `update`.                                  |
+| `instanceId`   | EC2 instanceId (not required if `action` is `list`)                                                                       |
+| `sectionNames` | is one or more of `ec2Instance`, `playServer` or `postgresServer`                                                         |
+
+### provisionPlay
+The `bin/provisionPlay` script runs all of the Ansible scripts necessary to provision Play on the EC2 instances with IDs listed in the `playServers` section in `hosts.ini`.
+Options are the same as for the `run` script above.
+
+### provisionPostgres
+The `bin/provisionPostgres` script runs all of the Ansible scripts necessary to provision Postgres on the EC2 instances with IDs listed in the `postgresServers` section in `hosts.ini`.
+Options are the same as for the `run` script above.
 
 ## Ansible Scripts
 Scripts may contain variables that need to be customized for your specific deployments. 
@@ -91,7 +116,7 @@ Where `scriptName` is one of the above Ansible scripts.
 | `-v`         | increments verbose output (can be specified up to 3 times)      |
 | `-x`         | Debug mode                                                      |
 
-### hosts.ini
+## hosts.ini
 This file drives the Ansible scripts.
 It is automatically maintained through the bash scripts in the `bin/` directory.
 This file contains 6 sections: 
@@ -129,29 +154,6 @@ i-8ae6adf1
 
 [postgresServers.domains]
 ````
-
-### hosts
-Command that adds, lists, or removes hostIds to/in/from section(s) in `hosts.ini`. 
-Can also silently update the `*.domain` sections from the `*.ids` sections.
-
-**Usage**
-
-    hosts action [instanceId] sectionNames 
-
-**Where**
-| Option         | Description                                                                                                               |
-| -------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| `action`       | One of `add`, `list`, `remove` or `update`. The `list` action also performs an `update`.                                  |
-| `instanceId`   | EC2 instanceId (not required if `action` is `list`)                                                                       |
-| `sectionNames` | is one or more of `ec2Instance`, `playServer` or `postgresServer`                                                         |
-
-### provisionPlay
-The `bin/provisionPlay` script runs all of the Ansible scripts necessary to provision Play on the EC2 instances with IDs listed in the `playServers` section in `hosts.ini`.
-Options are the same as for the `run` script above.
-
-### provisionPostgres
-The `bin/provisionPostgres` script runs all of the Ansible scripts necessary to provision Postgres on the EC2 instances with IDs listed in the `postgresServers` section in `hosts.ini`.
-Options are the same as for the `run` script above.
 
 ## System Service
 If you are logged into the remote server, you can start, restart and stop the Play application system service like this:
