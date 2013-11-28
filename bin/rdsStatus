@@ -20,12 +20,11 @@ for instanceId in sys.argv[1:]:
   try:
     p = subprocess.Popen("aws rds describe-db-instances --db-instance-identifier {0}".format(instanceId), stdout=subprocess.PIPE, shell=True)
     (output, err) = p.communicate()
-    reservations = json.loads(output)['Reservations']
+    instances = json.loads(output)['DBInstances']
   except Exception as ex:
     pass
   else:
     space = ""
-    for reservation in reservations:
-      for instance in reservation['Instances']:
-        print "%s%s" % (space, instance['State']['Name'])
-        space = " "
+    for instance in instances:
+      print "%s%s" % (space, instance['DBInstanceStatus'])
+      space = " "
