@@ -6,11 +6,12 @@ import simplejson as json
 import sys
 
 def help():
-  sys.exit('''Returns the run status of the EC2 instances with the specified database instance ID.
+  sys.exit('''Returns the run status of the RDS instances with the specified database instanceId.
 
 Usage: %s instanceIds
 
-Returned values are: available, backing-up, creating, deleting, failed, incompatible-network, incompatible-option-group, incompatible-parameters, incompatible-restore, modifying, rebooting, renaming, resetting-master-credentials and storage-full, ''' % os.path.basename(sys.argv[0]))
+One value is returned for each instanceId.
+Returned values can be: available, backing-up, creating, deleting, failed, incompatible-network, incompatible-option-group, incompatible-parameters, incompatible-restore, modifying, rebooting, renaming, resetting-master-credentials and storage-full, ''' % os.path.basename(sys.argv[0]))
 
 if len(sys.argv)<2:
   help()

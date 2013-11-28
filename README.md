@@ -61,7 +61,8 @@ The following scripts are available in the `yaml` directory:
 | `postgresEnv` | Installs Postgres dependencies such as `pvm` and `java`. Use `psql` to restore the database before running `playLaunch` |
 
 **Usage**
-Run individual Ansible scripts on the hosts with IDs listed in `hostIds` like this (`-s` causes the script to run as superuser via `sudo`):
+
+Run individual Ansible scripts on the hosts with IDs listed in `hostIds` like this:
 
     bin/run [options] scriptName
 
