@@ -2,7 +2,7 @@
 
 function help {
   echo "Stops the EC2 instance with the specified instanceId."
-  echo -e "\nUsage: $(basename $0) [options] instanceId\n"
+  echo -e "\nUsage: $(basename $0) [options] instanceIds\n"
   echo "Options are:"
   echo "  -x  Debug mode"
   echo "  -h  Display help"
