@@ -52,6 +52,9 @@ transport=ssh
 6. Run `bin/makeHostIni` to create or update `hosts.ini`. Do this every time you add an ec2 instance id to `hostIds`. 
    You also need to do this each time an AWS EC2 instance is restarted unless you have provisioned permanent IP addresses.
 
+## Utility Scripts
+The `bin` directory contains bash scripts for [EC2](EC2.md) and [RDS](RDS.md) operation, and also contains undocumented utility bash scripts.
+
 ## Ansible Scripts
 Scripts may contain variables that need to be customized for your specific deployments. 
 Commonly modified variables have been factored into `bin/custom.sample`. 
@@ -116,9 +119,6 @@ Options are the same as for the `run` script above.
 ### provisionPostgres
 The `bin/provisionPostgres` script runs all of the Ansible scripts necessary to provision Postgres on the EC2 instances with IDs listed in the `postgresServers` section in `hosts.ini`.
 Options are the same as for the `run` script above.
-
-## Utility Scripts
-The `bin` directory contains [EC2](EC2.md) and [RDS](RDS.md) utility scripts.
 
 ## System Service
 If you are logged into the remote server, you can start, restart and stop the Play application system service like this:
