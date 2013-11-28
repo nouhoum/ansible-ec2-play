@@ -5,13 +5,15 @@ function help {
   echo "Display all EC2 instance ids for this AWS account."
   echo -e "\nUsage: $(basename $0) [options]\n"
   echo "Options are:"
-  echo "  -h  Display help"
-  echo "  -x  Debug mode"
+  echo "  -g group  Only show IDs for the specified group (ec2Instances, playServers or postgresServers)"
+  echo "  -h        Display help"
+  echo "  -x        Debug mode"
   exit -1
 }
 
-while getopts "xh?" opt; do
+while getopts ":g:hx?" opt; do
   case $opt in
+    g) GROUP=$OPTARG ;;
     x) DEBUG=true ;;
     *) help       ;;
   esac
@@ -22,4 +24,8 @@ if [ "$#" -ne 0 ]; then help; fi
 
 if [ "$DEBUG" ]; then set -xv; fi
 
-aws ec2 describe-instances | grep "InstanceId" | cut -d'"' -f4
+if [ "$GROUP" ]; then
+  hosts list $GROUP
+else
+  aws ec2 describe-instances | grep "InstanceId" | cut -d'"' -f4
+fi

@@ -90,4 +90,4 @@ trap - SIGTERM
 JSON=`DO aws ec2 run-instances $IMAGE_ID $AZ $COUNT $CLASS_FQ $DRY $KEY_NAME $OUTPUT $SECURITY_GROUP $QUIET`
 
 INSTANCE_ID=`echo "$JSON" | grep "InstanceId" | cut -d'"' -f4`
-if [ -z "$DRY" ] && [ "$GROUP_NAMES" ]; then iniUpdate add $INSTANCE_ID $GROUP_NAMES; fi
+if [ -z "$DRY" ] && [ "$GROUP_NAMES" ]; then hosts add $INSTANCE_ID $GROUP_NAMES; fi

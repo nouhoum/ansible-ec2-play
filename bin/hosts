@@ -5,24 +5,29 @@ import os
 import sys
 
 def help():
-  sys.exit('''Adds or removes hostIds to/from a section in hosts.ini 
+  sys.exit('''Adds, lists, or removes hostIds to/in/from section(s) in hosts.ini 
 
-Usage: %s action instanceId sectionNames 
+Usage: %s action [instanceId] sectionNames 
 
 Where:
-  action is add or remove
-  instanceId EC2 instanceId
+  action is add, list or remove
+  instanceId EC2 instanceId (not required if action is list)
   sectionNames is one or more of ec2Instances, playServers or postgresServers''' % os.path.basename(sys.argv[0]))
 
-if len(sys.argv)<3:
+if len(sys.argv)<2:
   help()
 
 iniFile = 'hosts.ini'
 sectionNameList = ['ec2Instances', 'playServers', 'postgresServers']
 action = sys.argv[1]
-instanceId = sys.argv[2]
-sectionNames = sys.argv[3:]
-
+if action=='list':
+  if len(sys.argv)<3:
+    help()
+  else:
+    sectionNames = sys.argv[2:]
+else:
+  instanceId = sys.argv[2]
+  sectionNames = sys.argv[3:]
 config = ConfigParser.RawConfigParser(allow_no_value=True)
 config.read(iniFile)
 
@@ -38,6 +43,12 @@ for sectionName in sectionNames:
 if action=='add':
   for sectionName in sectionNames:
     config.set(sectionName, instanceId)  
+elif action=='list':
+  for sectionName in sectionNames:
+    space = ""
+    for option in config.options(sectionName):
+      print("{0}{1}".format(option, space))
+      space = " "
 elif action=='remove':
   for sectionName in sectionNames:
     if config.has_option(sectionName, instanceId):

@@ -28,7 +28,7 @@ cd $DIR
 
 rm -f hostIds
 if [ "$ALL" ]; then 
-  for x in `ec2Ids`; do iniUpdate add $x ec2Instance; done
+  for x in `ec2Ids`; do hosts add $x ec2Instance; done
 fi
 
 echo "[ec2Instance]" > hosts.ini
