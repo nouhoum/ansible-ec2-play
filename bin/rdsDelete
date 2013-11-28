@@ -5,14 +5,24 @@ function help {
   echo "This operation takes several minutes, during which time rdsIds will continue to show that the database exists."
   echo -e "\nUsage: $(basename $0) [options] databaseId\n"
   echo "Options are:"
-  echo "  -x  Debug mode"
+  echo "  -d  Dry run"
   echo "  -h  Display help"
+  echo "  -w  Wait until operation has completed before exiting"
+  echo "  -x  Debug mode"
+  echo -e "\nExample:\n"
+  echo "  Wait for the Postgres database server with id test to be deleted."
+  echo "  rdsDelete -w test"
   exit -1
 }
 
-while getopts "dxh?" opt; do
+function DELETEABLE_STATE {
+  if [[ "available failed storage-full incompatible-option-group incompatible-parameters incompatible-restore incompatible-network" =~ "$1" ]]; then echo true; fi
+}
+
+while getopts "dxhw?" opt; do
   case $opt in
   	d) DRY=true   ;;
+    w) WAIT=true ;;
     x) DEBUG=true ;;
     *) help       ;;
   esac
@@ -21,10 +31,30 @@ shift $(($OPTIND-1))
 
 if [ "$#" -ne 1 ]; then help; fi
 
-CMD="rds-delete-db-instance $1 -f --skip-final-snapshot --show-xml"
+CMD="aws rds delete-db-instance --db-instance-identifier $1 -f --skip-final-snapshot"
 if [ "$DRY" ]; then
   echo "$CMD"
 else
   if [ "$DEBUG" ]; then set -xv; fi
   echo "$($CMD)"
+
+  if [ ! `DELETEABLE_STATE $1` ]; then
+    echo -n "Waiting for server to reach a state where deletion is possible..."
+    MORE=true
+    while [ "$MORE" ]; do
+      echo -n "."
+      sleep 5
+      MORE=`DELETEABLE_STATE $1`
+    done
+    echo ""
+  fi
+
+  if [ "$WAIT" ]; then
+    echo -n "Deleting..."
+    while [ "$(rdsStatus $1)" == "deleting" ]; do
+      echo -n "."
+      sleep 5
+    done
+    echo " deleted."
+  fi
 fi

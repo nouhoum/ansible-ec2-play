@@ -1,0 +1,53 @@
+#!/bin/bash
+
+function cidrip {
+  PUBLIC_IP=`curl -s http://checkip.dyndns.org | awk '{print $6}' | awk 'BEGIN {FS = "<"} {print $1}'`
+  echo "$PUBLIC_IP/1"
+}
+
+function CHECK_AWS {
+  if [ -z `which aws` ] || [[ `aws --version 2>&1` != aws-cli* ]]; then
+    echo "Error: aws cli has not been installed"
+    echo "  1) Install the AWS command line interpreter: http://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-set-up.html"
+    echo "  2) Configure the AWS CLI: http://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html"
+    echo "  3) See also http://docs.aws.amazon.com/AmazonRDS/latest/CommandLineReference/CLIReference-cmd-AuthorizeDBSecurityGroupIngress.html"
+    exit -2
+  fi
+}
+
+function AUTHORIZE_AWS {
+  if [ -z "$CIDRIP" ]; then
+    echo "Error: AUTHORIZE_AWS has no value for CIDRIP"
+    exit -3
+  fi
+  if [ -z "$(aws rds describe-db-security-groups | grep authorized)" ]; then
+    aws rds authorize-db-security-group-ingress --region us-east-1 --db-security-group-name Default --cidrip $CIDRIP > /dev/null
+    echo -n "Waiting for security access to be granted to $CIDRIP"
+    while [ -z "$(aws rds describe-db-security-groups | grep authorized)" ]; do
+      echo -n "."
+      sleep 4
+    done
+    echo ""
+  fi
+}
+
+function MAYBE_AUTHORIZE_AWS {
+  if [ "$1" == aws ] ; then
+    CHECK_AWS
+    export CIDRIP=`cidrip`
+    AUTHORIZE_AWS
+  fi
+}
+
+function MAYBE_REVOKE_AWS {
+  if [ "$1" == aws ]; then
+    aws rds revoke-db-security-group-ingress --region us-east-1 --db-security-group-name Default --cidrip $CIDRIP > /dev/null
+    echo -n "Waiting for revocation of security access by $CIDRIP to complete"
+    sleep 2
+    while [ "$(aws rds describe-db-security-groups | grep revoking)" ]; do
+      echo -n .
+      sleep 2
+    done
+    echo ""
+  fi
+}

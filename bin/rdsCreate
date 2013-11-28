@@ -12,15 +12,19 @@ function help {
   echo "  -r int     The number of days automated backups are retained"
   echo "  -u string  Master database user name, set to master if not specified"
   echo "  -q         Quiet mode; suppress all output"
+  echo "  -w         Wait until operation has completed before exiting"
   echo "  -x         Debug mode"
   echo "  -z string  Availability Zone; examples: us-east-1a, us-east-1b, us-west, set to us-east-1c if not specified"
-  echo -e "\nAnd:\n"
+  echo -e "\nWhere:\n"
   echo "  instanceId is the name by which you wish to refer to the new DB server"
   echo "  classFQ is one of: micro, small, medium, large, xlarge, xxlarge, xxxlarge, 4xlarge, 8xlarge"
   echo "  dbName is the name of the database to be managed by the new server"
   echo "  engine is one of: MySQL, postgres, oracle-se1, oracle-se, oracle-ee, sqlserver-ee, sqlserver-se, sqlserver-ex, sqlserver-web"
   echo "  storage to be allocated, in GB"
   #echo "  engineVersion is left out"
+  echo -e "\nExample:\n"
+  echo "  Wait for a Postgres database server to be created on a micro instance in the default availability zone, default user id and password with ID test, a database called testdb and 10GB capacity."
+  echo "  rdsCreate -w test micro testdb postgres 10"
   exit -1
 }
 
@@ -40,36 +44,44 @@ function classFQ {
 
 if [ $# -lt 6 ]; then help; fi
 
-ACCESSIBILITY="-pub true"
-AZ="-z us-east-1c"
-OUTPUT="--show-xml"
-PASSWORD="-p blahblah"
-SHOW_URL="--show-request"
-USER="-u master"
+ACCESSIBILITY="--publicly-accessible"
+AZ="--availability-zone us-east-1c"
+PASSWORD="--master-user-password blahblah"
+USER="--master-username master"
 
-while getopts ":P:dxi:p:qr:u:z:h?" opt; do
+while getopts ":P:dxi:p:qr:u:z:wh?" opt; do
   case $opt in
-    P) PORT="--port $OPTARG"    ;;
-    d) DRY=true                 ;;
-    i) IOPS="--iops $OPTARG"    ;;
-    p) PASSWORD="-p $OPTARG"    ;;
-    q) QUIET=true               ;;
-    r) BACKUPS="-r $OPTARG"     ;;
-    u) USER="-u $OPTARG"        ;;
-    x) DEBUG=true               ;;
-    z) AZ="-z $OPTARG"          ;;
-    *) help                     ;;
+    P) PORT="--port $OPTARG"                     ;;
+    d) DRY=true                                  ;;
+    i) IOPS="--iops $OPTARG"                     ;;
+    p) PASSWORD="--master-user-password $OPTARG" ;;
+    q) QUIET=true                                ;;
+    r) BACKUPS="-r $OPTARG"                      ;;
+    u) USER="--master-username $OPTARG"          ;;
+    w) WAIT=true                                 ;;
+    x) DEBUG=true                                ;;
+    z) AZ="--availability-zone $OPTARG"          ;;
+    *) help                                      ;;
   esac
 done
 shift $(($OPTIND-1))
 
 CLASS_FQ="--db-instance-class $(classFQ $2)"
-CMD="rds-create-db-instance $1 $CLASS_FQ -n $3 -e $4 -s $5"
-CMD="$CMD $PORT $USER $PASSWORD $IOPS $BACKUPS $AZ $ACCESSIBILITY $OUTPUT $QUIET $SHOW_URL"
+CMD="aws rds create-db-instance --db-instance-identifier $1 $CLASS_FQ --db-name $3 --engine $4 --allocated-storage $5"
+CMD="$CMD $PORT $USER $PASSWORD $IOPS $BACKUPS $AZ $ACCESSIBILITY $QUIET"
 if [ "$DRY" ]; then
   echo "$CMD"
 else
   if [ "$DEBUG" ]; then set -xv; fi
-  echo "$($CMD)"
+  "$CMD" > /dev/null
   echo $0 >> hostIds
+
+  if [ "$WAIT" ]; then
+    echo -n "Creating..."
+    while [ "$(ec2Status $1)" == "pending" ]; do
+      echo -n "."
+      sleep 5
+    done
+    echo " created."
+  fi
 fi

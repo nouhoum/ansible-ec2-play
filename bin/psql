@@ -1,0 +1,28 @@
+#!/bin/bash
+
+# Both of these formats work for AWS RDS, if the default security group has a CIDR/IP of 0.0.0.0/0 set.
+# If you create a second security group then it fails!
+# PGPASSWORD=scalacourses /usr/local/bin/psql -h scalacourses.cag6cxzv3uos.us-east-1.rds.amazonaws.com -U scalacourses -d scalacourses -p 5432
+# PGPASSWORD=scalacourses /usr/local/bin/psql -U scalacourses -p 5432 "sslmode=require host=scalacourses.cag6cxzv3uos.us-east-1.rds.amazonaws.com dbname=scalacourses"
+
+
+# Hack for adding single SQL query to existing script
+if [ "$1" == "-c" ]; then
+  export CMD="$2"
+  shift
+  shift
+fi
+
+source defineCmds
+source dbCommon
+
+MAYBE_AUTHORIZE_AWS "$@"
+PSQL=`(cd /; which psql)`
+
+if [ "$CMD" ]; then
+  PGPASSWORD=$PGPASSWORD $PSQL -h $HOST -U $USERID -d $DB -c "$CMD"
+else
+  PGPASSWORD=$PGPASSWORD $PSQL -h $HOST -U $USERID -d $DB
+fi
+
+MAYBE_REVOKE_AWS "$@"

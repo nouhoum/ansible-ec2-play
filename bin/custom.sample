@@ -7,4 +7,3 @@ export ANSIBLE_PLAY_APP_NAME=myapp
 export ANSIBLE_PLAY_APP_VERSION=0.1.0
 export ANSIBLE_REPO_URL=git@git.org:user/project.git
 export ANSIBLE_UBUNTU_RELEASE=saucy
-

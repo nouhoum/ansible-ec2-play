@@ -1,0 +1,30 @@
+#!/usr/bin/env python
+
+import os
+import subprocess
+import simplejson as json
+import sys
+
+def help():
+  sys.exit('''Returns the run status of the EC2 instances with the specified database instance ID.
+
+Usage: %s instanceIds
+
+Returned values are: available, backing-up, creating, deleting, failed, incompatible-network, incompatible-option-group, incompatible-parameters, incompatible-restore, modifying, rebooting, renaming, resetting-master-credentials and storage-full, ''' % os.path.basename(sys.argv[0]))
+
+if len(sys.argv)<2:
+  help()
+
+for instanceId in sys.argv[1:]:
+  try:
+    p = subprocess.Popen("aws rds describe-db-instances --db-instance-identifier {0}".format(instanceId), stdout=subprocess.PIPE, shell=True)
+    (output, err) = p.communicate()
+    reservations = json.loads(output)['Reservations']
+  except Exception as ex:
+    pass
+  else:
+    space = ""
+    for reservation in reservations:
+      for instance in reservation['Instances']:
+        print "%s%s" % (space, instance['State']['Name'])
+        space = " "

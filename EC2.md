@@ -1,5 +1,9 @@
 # EC2 Utilities
 
+## AWS command line interface
+These features require the [AWS command-line interface](http://aws.amazon.com/developertools/2928). 
+Documentation on the AWS CLI commands [here](http://aws.amazon.com/cli/).
+
 ## ec2Create
 Creates an EC2 instance and key pair if required.
 The ID of the new EC2 instance is automatically added to `hostIds`.
