@@ -75,6 +75,7 @@ IDs of deleted EC2 instances are automatically removed from `hostIds`.
 | ------------ | --------------------------------------------------------------- |
 | `-d`         | Dry run, shows commands that would be executed                  |
 | `-h`         | Display help                                                    |
+| `-w`         | Wait for the process to complete before returning               |
 | `-x`         | Debug mode                                                      |
 
 **Example**
@@ -185,6 +186,7 @@ Starts the EC2 instances with the specified `instanceId`s.
 | Option       | Description                                                     |
 | ------------ | --------------------------------------------------------------- |
 | `-h`         | Display help                                                    |
+| `-w`         | Wait for the process to complete before returning               |
 | `-x`         | Debug mode                                                      |
 
 ## ec2Stop
@@ -199,4 +201,5 @@ Stops the EC2 instances with the specified `instanceId`s.
 | Option       | Description                                                     |
 | ------------ | --------------------------------------------------------------- |
 | `-h`         | Display help                                                    |
+| `-w`         | Wait for the process to complete before returning               |
 | `-x`         | Debug mode                                                      |

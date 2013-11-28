@@ -4,13 +4,15 @@ function help {
   echo "Stops the EC2 instances with the specified instanceId."
   echo -e "\nUsage: $(basename $0) [options] instanceIds\n"
   echo "Options are:"
-  echo "  -x  Debug mode"
   echo "  -h  Display help"
+  echo "  -w  Wait until operation is complete before returning"
+  echo "  -x  Debug mode"
   exit -1
 }
 
 while getopts "xh?" opt; do
   case $opt in
+    w) WAIT=true  ;;
     x) DEBUG=true ;;
     *) help       ;;
   esac
@@ -20,3 +22,12 @@ shift $(($OPTIND-1))
 if [ $# -ne 1 ]; then help; fi
 
 aws ec2 stop-instances --instance-ids $@
+
+if [ "$WAIT" ]; then
+  echo -n "Stopping..." 
+  while [ "$(ec2Status $INSTANCE_ID)" != "stopped" ]; do
+    echo -n "."
+    sleep 5
+  done
+  echo " stopped."
+fi
