@@ -18,6 +18,7 @@ if len(sys.argv)<3:
   help()
 
 iniFile = 'hosts.ini'
+sectionNameList = ['ec2Instances', 'playServers', 'postgresServers']
 action = sys.argv[1]
 instanceId = sys.argv[2]
 sectionNames = sys.argv[3:]
@@ -25,8 +26,12 @@ sectionNames = sys.argv[3:]
 config = ConfigParser.RawConfigParser(allow_no_value=True)
 config.read(iniFile)
 
+for sectionName in sectionNameList:
+  if not config.has_section(sectionName):
+    config.add_section(sectionName)
+
 for sectionName in sectionNames:
-  if sectionName not in ['ec2Instances', 'playServers', 'postgresServers']:
+  if sectionName not in sectionNameList:
     print("Error: {0} is an invalid sectionName\n".format(sectionName))
     help()
 
