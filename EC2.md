@@ -172,11 +172,11 @@ Values returned are: `pending`, `running`, `stopping`, `stopped` and `terminated
     ec2Status instanceId
 
 ## ec2Start
-Starts the EC2 instance with the specified `instanceId`.
+Starts the EC2 instances with the specified `instanceId`s.
 
 **Usage**
 
-    ec2Start [options] instanceId
+    ec2Start [options] instanceIds
 
 **Options**
 
@@ -186,11 +186,11 @@ Starts the EC2 instance with the specified `instanceId`.
 | `-x`         | Debug mode                                                      |
 
 ## ec2Stop
-Stops the EC2 instance with the specified `instanceId`.
+Stops the EC2 instances with the specified `instanceId`s.
 
 **Usage**
 
-    ec2Stop [options] instanceId
+    ec2Stop [options] instanceIds
 
 **Options**
 
