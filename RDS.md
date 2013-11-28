@@ -1,6 +1,4 @@
-# AWS command line toolkit Support for RDS
-These features require the [AWS command-line toolkit](http://aws.amazon.com/developertools/2928). 
-Documentation on the AWS RDS commands [here](http://docs.aws.amazon.com/AmazonRDS/latest/CommandLineReference/Welcome.html).
+# AWS RDS Utilities
 
 ## rdsCreate
 Creates a database server.

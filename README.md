@@ -9,9 +9,19 @@ Support for AWS RDS Postgres is also provided via the `bin/rds*` commands.
 
 **WARNING: USE AT YOUR OWN RISK. NO WARRANTY, EXPRESS OR IMPLIED IS PROVIDED.**
 
+## Dependencies
+
+Install and configure the following.
+
+* [Ansible](https://github.com/ansible/ansible)
+* [jq](http://stedolan.github.io/jq/download/)
+* [AWS command-line toolkit](http://aws.amazon.com/developertools/2928). 
+[General AWS command-line documentation](http://aws.amazon.com/cli/).
+AWS RDS command-line documentation [here](http://docs.aws.amazon.com/AmazonRDS/latest/CommandLineReference/Welcome.html).
+
 ## Steps
 
-1. If your git repository is private and therefore requires authentication:
+1. If the git repository that holds your Play project is private and therefore requires authentication:
 
   a. Run the following on every EC2 instance as root (not sure how to automate this)
     

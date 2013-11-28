@@ -1,9 +1,5 @@
 # EC2 Utilities
 
-## AWS command line interface
-These features require the [AWS command-line interface](http://aws.amazon.com/developertools/2928). 
-Documentation on the AWS CLI commands [here](http://aws.amazon.com/cli/).
-
 ## ec2Create
 Creates an EC2 instance and key pair if required.
 The ID of the new EC2 instance is automatically added to `hostIds`.
@@ -42,7 +38,7 @@ Where:
 Create a generic Ubuntu 13.10 micro image in the default availability zone with the default security group, and wait for the process to complete before returning. 
 Define key pair `testKey` if it does not already exist.
 
-    ec2Create -w testServer testKey t1.micro ami-51274050
+    ec2Create -w testServer testKey t1.micro ami-4b143122
 
 Create a Play server using Ubuntu 13.10 micro image in `us-east-1c`, and wait for the process to complete before returning:
 
