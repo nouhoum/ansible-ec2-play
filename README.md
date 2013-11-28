@@ -14,10 +14,10 @@ Support for AWS RDS Postgres is also provided via the `bin/rds*` commands.
 Install and configure the following.
 
 * [Ansible](https://github.com/ansible/ansible)
-* [jq](http://stedolan.github.io/jq/download/)
+* [jq](http://stedolan.github.io/jq/download/), a lightweight and flexible command-line JSON processor.
 * [AWS command-line toolkit](http://aws.amazon.com/developertools/2928). 
 [General AWS command-line documentation](http://aws.amazon.com/cli/).
-AWS RDS command-line documentation [here](http://docs.aws.amazon.com/AmazonRDS/latest/CommandLineReference/Welcome.html).
+[AWS RDS command-line documentation](http://docs.aws.amazon.com/AmazonRDS/latest/CommandLineReference/Welcome.html).
 
 ## Steps
 
