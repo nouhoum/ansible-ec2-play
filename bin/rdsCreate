@@ -78,7 +78,7 @@ else
 
   if [ "$WAIT" ]; then
     echo -n "Creating..."
-    while [ "$(ec2Status $1)" == "pending" ]; do
+    while [ "$(rdsStatus $1)" == "pending" ]; do
       echo -n "."
       sleep 5
     done

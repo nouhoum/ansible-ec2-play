@@ -81,8 +81,12 @@ Displays the `DBInstanceIdentifier` for each database owned by this account
 
 ## rdsStatus
 Returns the run status of the RDS instance with the specified `instanceId`.
-Values returned are: `pending`, `running`, `stopping`, `stopped` and `terminated`.
+Values returned are: `available`, `backing-up`, `creating`, `deleting`, `failed`, `incompatible-network`, `incompatible-option-group`, `incompatible-parameters`, `incompatible-restore`, `modifying`, `rebooting`, `renaming`, `resetting-master-credentials` and `storage-full`.
 
 **Usage**
 
     rdsStatus instanceId
+
+**Example**
+
+    rdsStatus `rdsIds`
