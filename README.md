@@ -167,12 +167,14 @@ Database servers should be provisioned before the application servers.
 
     # Create an Ubuntu 13.10 micro instance in the default availability zone with the default security group.
     # Define key pair scalaCourses if it does not already exist.
-    bin/ec2Create scalaCoursesDB scalaCourses t1.micro ami-4b143122 postgresServers 
+    # Wait for the command to complete before returning.
+    bin/ec2Create -w scalaCoursesDB scalaCourses t1.micro ami-4b143122 postgresServers 
     bin/provisionPostgres
 
     # Create an Ubuntu 13.10 micro instance in the default availability zone with the default security group.
     # Use the scalaCourses key pair again.
-    bin/ec2Create scalaCoursesPlay scalaCourses t1.micro ami-4b143122 playServers
+    # Wait for the command to complete before returning.
+    bin/ec2Create -w scalaCoursesPlay scalaCourses t1.micro ami-4b143122 playServers
     bin/provisionPlay
 
 ## References
