@@ -19,4 +19,4 @@ shift $(($OPTIND-1))
 
 if [ $# -ne 1 ]; then help; fi
 
-aws ec2 stop-instances --instance-ids $1
+aws ec2 stop-instances --instance-ids $@
