@@ -1,5 +1,4 @@
 *~
 bin/custom
 hosts.ini
-hostIds.ini
 *.pem
