@@ -2,7 +2,7 @@
 # More details on steps to secure at: http://www.thefanclub.co.za/how-to/how-secure-ubuntu-1204-lts-server-part-1-basics 
 # Remember to run: ufw enable after rebooting
 ---
-- hosts: ec2Instances
+- hosts: ec2Instance.domains
   sudo: yes
   vars:
   - ubuntu_release: $ENV(ANSIBLE_UBUNTU_RELEASE)

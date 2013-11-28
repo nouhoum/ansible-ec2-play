@@ -1,6 +1,6 @@
 # This installs PostgreSQL on an Ubuntu system, creates a database and a user.
 ---
-- hosts: postgresServers
+- hosts: postgresServers.domains
   sudo: yes
   gather_facts: no
 
@@ -15,7 +15,7 @@
         - libpq-dev
         - python-psycopg2
 
-- hosts: postgresServers
+- hosts: postgresServers.domains
   sudo: yes
   sudo_user: postgres
   gather_facts: no

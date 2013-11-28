@@ -48,9 +48,10 @@ transport=ssh
 ```` 
     ssh-agent && ssh-add ~/path/to/foo.pem
 ````
-5. Edit `hostIds` and enter your ec2 instance id(s), one per line. Keep this file up to date as you add and remove EC2 instances.
-6. Run `bin/makeHostIni` to create or update `hosts.ini`. Do this every time you add an ec2 instance id to `hostIds`. 
+6. Run `bin/hostIni` to create or update `hosts.ini`.  
    You also need to do this each time an AWS EC2 instance is restarted unless you have provisioned permanent IP addresses.
+5. Edit `hostIds` and enter the instance id(s) of pre-existing EC2 instances, one per line. 
+   This file is automatically kept up to date by the `bin/` scripts as you add and remove EC2 and RDS instances.
 
 ## Bash Scripts
 The `bin` directory contains bash scripts for [EC2](EC2.md) and [RDS](RDS.md) operation, and also contains undocumented utility bash scripts.
@@ -75,7 +76,7 @@ The following Ansible scripts are available in the `yaml` directory:
 
 **Usage**
 
-Run individual Ansible scripts on the hosts with IDs listed in `hostIds` like this:
+Run individual Ansible scripts on the hosts with IDs listed in `hosts.ini` like this:
 
     bin/run [options] scriptName
 
@@ -91,25 +92,42 @@ Where `scriptName` is one of the above Ansible scripts.
 | `-x`         | Debug mode                                                      |
 
 ### hosts.ini
-This file drives all of the Ansible scripts.
-It is automatically maintained through the scripts in the `bin/` directory.
+This file drives the Ansible scripts.
+It is automatically maintained through the bash scripts in the `bin/` directory.
+This file contains 6 sections: 
 
-This file contains 3 sections: a section listing the EC2 instanceIDs of generic EC2 servers, 
-a section listing the EC2 instanceIDs of Play servers, 
-and a section listing the EC2 instanceIDs of Postgres servers.
+1. A section listing the EC2 instanceIDs of generic EC2 servers: `ec2Instances.ids` 
+2. A section listing the EC2 instanceIDs of Play servers: `playServers.ids`
+3. A section listing the EC2 instanceIDs of Postgres servers: `postgresServers.ids`
+4. A section listing the EC2 domain names of generic EC2 servers: `ec2Instance.domains` 
+5. A section listing the EC2 domain names of Play servers: `playServers.domains`
+6. A section listing the EC2 domain names of Postgres servers: `postgresServers.domains`
 
-Note that each entry in the `playServers` and `postgresServers` sections should also appear in the `ec2Instances` section.
+Note that each entry in the `playServer.ids` and `postgresServer.ids` sections should also appear in the `ec2Instance.ids` section.
+Similarly, each entry in the `playServer.domains` and `postgresServer.domains` sections should also appear in the `ec2Instance.domains` section.
+
+The `bin/hostIni` command updates the three `*.domain` sections from the corresponding `*.ids` sections, removes dead entries, and is automatically invoked by the `bin/` scripts when adding and deleting servers.
 
 ````
-[ec2Instances]
-i-493cad31
-i-493cae73
+[ec2Instances.ids]
+i-8ae6adf1
+i-06c83262
+i-9cd52ff8
+i-f0560794
+i-12136369
 
-[playServers]
-i-493cad31
+[playServers.ids]
+i-f0560794
+i-12136369
 
-[postgresServers]
-i-493cae73
+[postgresServers.ids]
+i-8ae6adf1
+
+[ec2Instance.domains]
+
+[playServers.domains]
+
+[postgresServers.domains]
 ````
 
 ### provisionPlay

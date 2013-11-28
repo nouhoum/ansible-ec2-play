@@ -2,6 +2,7 @@
 
 import ConfigParser
 import os
+import subprocess as sub
 import sys
 
 def help():
@@ -12,13 +13,22 @@ Usage: %s action [instanceId] sectionNames
 Where:
   action is add, list or remove
   instanceId EC2 instanceId (not required if action is list)
-  sectionNames is one or more of ec2Instances, playServers or postgresServers''' % os.path.basename(sys.argv[0]))
+  sectionNames is one or more of ec2Instance, playServer or postgresServer''' % os.path.basename(sys.argv[0]))
+
+def domainName(instanceId):
+  "return domain name for the given instanceId"
+  try:
+    p = sub.Popen("bin/ec2Info -n " + instanceId, stdout=sub.PIPE, stderr=sub.PIPE)
+    domain, errors = p.communicate()
+  except:
+    domain = ""
+  return domain
 
 if len(sys.argv)<2:
   help()
 
 iniFile = 'hosts.ini'
-sectionNameList = ['ec2Instances', 'playServers', 'postgresServers']
+sectionNameList = ['ec2Instance', 'playServer', 'postgresServer']
 action = sys.argv[1]
 if action=='list':
   if len(sys.argv)<3:
@@ -32,8 +42,10 @@ config = ConfigParser.RawConfigParser(allow_no_value=True)
 config.read(iniFile)
 
 for sectionName in sectionNameList:
-  if not config.has_section(sectionName):
-    config.add_section(sectionName)
+  if not config.has_section(sectionName + ".ids"):
+    config.add_section(sectionName + ".ids")
+  if not config.has_section(sectionName + ".domains"):
+    config.add_section(sectionName + ".domains")
 
 for sectionName in sectionNames:
   if sectionName not in sectionNameList:
@@ -41,18 +53,23 @@ for sectionName in sectionNames:
     help()
 
 if action=='add':
+  domain = domainName(instanceId)
   for sectionName in sectionNames:
-    config.set(sectionName, instanceId)  
+    config.set(sectionName + ".ids", instanceId)
+    config.set(sectionName + ".domains", domain)
 elif action=='list':
   for sectionName in sectionNames:
     space = ""
-    for option in config.options(sectionName):
-      print("{0}{1}".format(option, space))
+    for option in config.options(sectionName + ".ids"):
+      print("{0}{1} {2}".format(option, space, domainName(option)))
       space = " "
 elif action=='remove':
+  domain = domainName(instanceId)
   for sectionName in sectionNames:
-    if config.has_option(sectionName, instanceId):
-      config.remove_option(sectionName, instanceId)
+    if config.has_option(sectionName + ".ids", instanceId):
+      config.remove_option(sectionName + ".ids", instanceId)
+    if domain.length>0 and config.has_option(sectionName + ".domains", domain):
+      config.remove_option(sectionName + ".domains", domain)
 else:
   printf("{0} is an invalid action".format(action))
   help()

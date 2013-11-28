@@ -1,7 +1,7 @@
 # Sets the Play environment in the server
 # Run with: run -vv playEnv
 ---
-- hosts: playServers
+- hosts: playServers.domains
   sudo: yes
   vars:
   - ubuntu_release: $ENV(ANSIBLE_UBUNTU_RELEASE)

@@ -1,7 +1,7 @@
 # Runs a Play 2 application, built using playDeploy.yaml
 # Run with: run -vv playLaunch
 ---
-- hosts: playServers
+- hosts: playServers.domains
   vars:
   - java_opts: $ENV(JAVA_OPTS)
 

@@ -2,7 +2,7 @@
 # Assumes a working Play deployment (via pvm: https://github.com/kaiinkinen/pvm) and Git are available, such as performed by the playEnv.yaml script.
 # Run with: run -vv playService
 ---
-- hosts: playServers
+- hosts: playServers.domains
   sudo: yes
   vars:
   - ubuntu_release: $ENV(ANSIBLE_UBUNTU_RELEASE)

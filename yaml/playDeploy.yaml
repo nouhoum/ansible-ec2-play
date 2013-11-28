@@ -3,7 +3,7 @@
 # WARNING: if your server has low memory (like a Micro EC2 instance) the build step may fail due to the OOM manager killing it. Enable swap or add more memory to the server.
 # Run with: run -vv playDeploy 
 ---
-- hosts: playServers
+- hosts: playServers.domains
   vars:
   - ubuntu_release: $ENV(ANSIBLE_UBUNTU_RELEASE)
   - user: $ENV(ANSIBLE_USER_ID)
