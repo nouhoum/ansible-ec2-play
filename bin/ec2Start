@@ -1,7 +1,7 @@
 #!/bin/bash
 
 function help {
-  echo "Starts the EC2 instance with the specified instanceId."
+  echo "Starts the EC2 instances with the specified instanceIds."
   echo -e "\nUsage: $(basename $0) [options] instanceIds\n"
   echo "Options are:"
   echo "  -x  Debug mode"
