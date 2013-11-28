@@ -52,7 +52,7 @@ transport=ssh
 6. Run `bin/makeHostIni` to create or update `hosts.ini`. Do this every time you add an ec2 instance id to `hostIds`. 
    You also need to do this each time an AWS EC2 instance is restarted unless you have provisioned permanent IP addresses.
 
-## Utility Scripts
+## Bash Scripts
 The `bin` directory contains bash scripts for [EC2](EC2.md) and [RDS](RDS.md) operation, and also contains undocumented utility bash scripts.
 
 ## Ansible Scripts
@@ -62,7 +62,7 @@ Make a copy of that file and save as `bin/custom` before modifying.
 
     cp bin/custom{.sample,}
 
-The following scripts are available in the `yaml` directory:
+The following Ansible scripts are available in the `yaml` directory:
 
 | Name          | Description                                                                                                             |
 | ------------- | ----------------------------------------------------------------------------------------------------------------------- |
@@ -132,12 +132,12 @@ Database servers should be provisioned before the application servers.
 
     # Create an Ubuntu 13.10 micro instance in the default availability zone with the default security group.
     # Define key pair scalaCourses if it does not already exist.
-    bin/ec2Create scalaCoursesDB scalaCourses t1.micro ami-51274050 postgresServers 
+    bin/ec2Create scalaCoursesDB scalaCourses t1.micro ami-4b143122 postgresServers 
     bin/provisionPostgres
 
     # Create an Ubuntu 13.10 micro instance in the default availability zone with the default security group.
     # Use the scalaCourses key pair again.
-    bin/ec2Create scalaCoursesPlay scalaCourses t1.micro ami-51274050 playServers
+    bin/ec2Create scalaCoursesPlay scalaCourses t1.micro ami-4b143122 playServers
     bin/provisionPlay
 
 ## References
