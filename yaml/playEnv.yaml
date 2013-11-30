@@ -17,11 +17,11 @@
 
   tasks:
    - name: Install Unzip
-     action: apt pkg=unzip state=latest install_recommends=yes    
+     action: apt pkg=unzip state=latest install_recommends=yes
 
    - name: Install Git
-     action: apt pkg=git state=latest install_recommends=yes    
- 
+     action: apt pkg=git state=latest install_recommends=yes
+
    - name: Remove old PVM checkouts
      action: file path=${pvm} state=absent
 
@@ -47,13 +47,13 @@
      action: apt update_cache=yes
 
    - name: Install Java 7
-     action: apt pkg=oracle-java7-installer state=latest install_recommends=yes    
+     action: apt pkg=oracle-java7-installer state=latest install_recommends=yes
 
    - name: Set Java 7 Env
      action: apt pkg=oracle-java7-set-default state=latest install_recommends=yes
 
    - name: Copy .bash_aliases
-     action: copy src=bin/.bash_aliases dest=/home/$user/.bash_aliases owner=$user group=$user mode=0644
+     action: copy src=bin/remote/.bash_aliases dest=/home/$user/.bash_aliases owner=$user group=$user mode=0644
 
    - name: Copy Play service wrapper and point it to the Play app launch script
      action: copy src=../bin/remote/play dest=/etc/init.d/play force=yes
