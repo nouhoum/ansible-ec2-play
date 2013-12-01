@@ -8,7 +8,7 @@ function help {
   #echo "  operation is one of add, ignore, modify or remove."
   echo "  instanceId is the EC2 instance ID to consider"
   echo "  type is only required for the add operation. One of: generic, playServer or postgresServer"
-  echo "  parameters is only required for the add operation: userId, password, publicKey, keySignature"
+  echo "  parameters are only required for the add operation. All of: userId, password, publicKey and keySignature"
   echo ""
   echo "Options are:"
   echo "  -h        Display help"
@@ -16,7 +16,7 @@ function help {
   echo ""
   echo "Examples:"
   echo "  data ignore i-234567"
-  echo "  data add i-234567 generic userName password publicKey keySignature"
+  echo "  data add    i-234568 generic userName password publicKey keySignature"
   echo "  data remove i-234567"
   exit -1
 }

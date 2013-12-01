@@ -64,18 +64,12 @@ The `bin` directory contains bash scripts for [EC2](EC2.md) and [RDS](RDS.md) op
 Generic scripts/commands are shown here.
 
 ### data
-Maintains data/settings
+Maintains `$ANSIBLE_DATA_DIR/data/settings`.
 
 **Options**
 
     -h        Display help
     -x        Debug mode
-
-**Examples**
-
-    data ignore i-234567
-    data add    i-234567 generic userName password publicKey keySignature
-    data remove i-234567
 
 **Usage**
 
@@ -88,14 +82,20 @@ Maintains data/settings
 | `operation`   | One of `add`, `ignore` or `remove`. |
 | `instanceId`  | The EC2 instance ID to consider.    |
 | `type`        | Only required for the `add` operation. One of: `generic`, `playServer` or `postgresServer`. |
-| `parameters`  | Only required for the `add` operation: All of: `userId`, `password`, `publicKey`, `keySignature` |
+| `parameters`  | Only required for the `add` operation: All of: `userId`, `password`, `publicKey` and `keySignature` |
+
+**Examples**
+
+    data ignore i-234567
+    data add    i-234568 generic userName password publicKey keySignature
+    data remove i-234567
 
 ### provisionPlay
-The `bin/provisionPlay` script runs all of the Ansible scripts necessary to provision Play on the EC2 instances with IDs listed in the `playServers` section in `hosts.ini`.
+The `bin/provisionPlay` script runs the necessary Ansible scripts to provision Play on the EC2 instances with IDs listed in the `playServers` section in `hosts.ini`.
 Options are the same as for the `run` script below.
 
 ### provisionPostgres
-The `bin/provisionPostgres` script runs all of the Ansible scripts necessary to provision Postgres on the EC2 instances with IDs listed in the `postgresServers` section in `hosts.ini`.
+The `bin/provisionPostgres` script runs the necessary Ansible scripts to provision Postgres on the EC2 instances with IDs listed in the `postgresServers` section in `hosts.ini`.
 Options are the same as for the `run` script below.
 
 ### Run
@@ -113,7 +113,7 @@ Where `scriptName` is one of the Ansible scripts below.
 | ------------ | --------------------------------------------------------------- |
 | `-d`         | Dry run, shows commands that would be executed                  |
 | `-h`         | Display help                                                    |
-| `-v`         | increments verbose output (can be specified up to 3 times)      |
+| `-v`         | Increments verbose output (can be specified up to 3 times)      |
 | `-x`         | Debug mode                                                      |
 
 ## Ansible Scripts
@@ -169,12 +169,15 @@ If you are logged into the remote server, you can start, restart and stop the Pl
 
 ## Sample Session
 Database servers should be provisioned before the application servers.
+You can either use the `bin/rdsCreate` command to create an AWS RDS database, or do the following to create a Postgres database using an Ansible script.
 
     # Create an Ubuntu 13.10 micro instance in the default availability zone with the default security group.
     # Define key pair scalaCourses if it does not already exist.
     # Wait for the command to complete before returning.
     bin/ec2Create -w scalaCoursesDB scalaCourses t1.micro ami-4b143122 postgresServers
     bin/provisionPostgres
+
+Regardless of how you provisioned your database, your next step is to provision a Play 2 server:
 
     # Create an Ubuntu 13.10 micro instance in the default availability zone with the default security group.
     # Use the scalaCourses key pair again.
