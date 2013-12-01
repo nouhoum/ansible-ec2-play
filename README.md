@@ -1,6 +1,6 @@
 # Ansible EC2 Play Framework
 This is a set of Ansible scripts to deploy Play 2.2+ web applications in EC2 instances.
-The EC2 instances for Play should be 'small' or larger; 'micro' instances won't be able to compile the Play app.
+The EC2 instances for Play should be 'small' or larger; 'micro' instances are not able to compile Play applications.
 Play applications are run as a system service.
 This project uses EC2 instance IDs to reference EC2 instances, because their IP addresses and DNS names change on every restart unless you have provisioned permanent IP addresses.
 
@@ -43,9 +43,12 @@ to this:
 ````
 transport=ssh
 ````
-3. Edit [`yaml/config/postfix_selections`](yaml/config/postfix_selections) to set domains for email
-4. Set the `ANSIBLE_DATA_DIR` environment variable to define the location of the directory to read/write your data from/to.
+3. Edit [`yaml/config/postfix_selections`](yaml/config/postfix_selections) to set up   email.
+4. Persistent data about the servers, including sensitive information, is stored in JSON format.
+   Set the `ANSIBLE_DATA_DIR` environment variable to define the location of the directory to read/write your data from/to.
    If the variable is not set, a directory called `data` will be created for this purpose within this project.
+   Beware: this information contains passwords and ssh keys.
+   Take steps to secure it!
 5. Copy the Amazon AWS keys for your existing EC2 instances to the `$ANSIBLE_DATA_DIR` directory.
 6. Add the Amazon AWS keys for your existing EC2 instances that won't be ignored by this project to your local `ssh` repository by running the following:
 ````
@@ -55,35 +58,9 @@ transport=ssh
    This will cause the domain names of those EC2 instances to be removed from `hosts.ini`.
 
 ## Bash Scripts
-The `bin` directory contains bash scripts for [EC2](EC2.md) and [RDS](RDS.md) operation, and also contains undocumented utility bash scripts.
-Generic scripts/commands are shown here.
-
-### data
-Maintains `$ANSIBLE_DATA_DIR/data/settings`.
-
-**Options**
-
-    -h        Display help
-    -x        Debug mode
-
-**Usage**
-
-    data [options] operation instanceId [type parameters]
-
-**Where**
-
-| Option        | Description                         |
-| ------------- | ----------------------------------- |
-| `operation`   | One of `add`, `ignore` or `remove`. |
-| `instanceId`  | The EC2 instance ID to consider.    |
-| `type`        | Only required for the `add` operation. One of: `generic`, `playServer` or `postgresServer`. |
-| `parameters`  | Only required for the `add` operation: All of: `userId`, `password`, `publicKey` and `keySignature` |
-
-**Examples**
-
-    data ignore i-234567
-    data add    i-234568 generic userName password publicKey keySignature
-    data remove i-234567
+The `bin` directory contains bash scripts for [EC2](EC2.md) and [RDS](RDS.md) operation, and also contains utility bash scripts.
+End user bash scripts are shown here.
+Internal bash script are documented [here](BASH.md).
 
 ### provisionPlay
 The `bin/provisionPlay` script runs the necessary Ansible scripts to provision Play on the EC2 instances with IDs listed in the `playServers` section in `hosts.ini`.
@@ -92,24 +69,6 @@ Options are the same as for the `run` script below.
 ### provisionPostgres
 The `bin/provisionPostgres` script runs the necessary Ansible scripts to provision Postgres on the EC2 instances with IDs listed in the `postgresServers` section in `hosts.ini`.
 Options are the same as for the `run` script below.
-
-### Run
-**Usage**
-
-Run individual Ansible scripts on the hosts with IDs listed in `hosts.ini` like this:
-
-    bin/run [options] scriptName
-
-Where `scriptName` is one of the Ansible scripts below.
-
-**Options**
-
-| Option       | Description                                                     |
-| ------------ | --------------------------------------------------------------- |
-| `-d`         | Dry run, shows commands that would be executed                  |
-| `-h`         | Display help                                                    |
-| `-v`         | Increments verbose output (can be specified up to 3 times)      |
-| `-x`         | Debug mode                                                      |
 
 ## Ansible Scripts
 Scripts may contain variables that need to be customized for your specific deployments.
