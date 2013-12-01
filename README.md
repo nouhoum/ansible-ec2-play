@@ -4,8 +4,8 @@ The EC2 instances for Play should be 'small' or larger; 'micro' instances won't 
 Play applications are run as a system service.
 This project uses EC2 instance IDs to reference EC2 instances, because their IP addresses and DNS names change on every restart unless you have provisioned permanent IP addresses.
 
-An Ansible script is provided to setup a Postgres database in an EC2 instance.
-Support for AWS RDS Postgres is also provided via the `bin/rds*` commands.
+[An Ansible script](yaml/postgresEnv.yaml) is provided to setup a Postgres database in an EC2 instance.
+Support for AWS RDS Postgres is also provided via the [`bin/rds*`](bin) commands.
 
 **WARNING: USE AT YOUR OWN RISK. NO WARRANTY, EXPRESS OR IMPLIED IS PROVIDED.**
 
@@ -43,21 +43,16 @@ to this:
 ````
 transport=ssh
 ````
-3. Edit `yaml/config/postfix_selections` to set domains for email
-4. Add the Amazon AWS keys for your EC2 instances to your local `ssh` repository by running the following:
-````
-    ssh-agent && ssh-add ~/path/to/foo.pem
-````
-5. Set the `ANSIBLE_DATA_DIR` environment variable to define the location of the directory to read/write your data from/to.
+3. Edit [`yaml/config/postfix_selections`](yaml/config/postfix_selections) to set domains for email
+4. Set the `ANSIBLE_DATA_DIR` environment variable to define the location of the directory to read/write your data from/to.
    If the variable is not set, a directory called `data` will be created for this purpose within this project.
-5. Run `bin/hosts` to create `hosts.ini`.
-   If you have already defined EC2 instances their instanceIds will be placed into `ec2Instances.ids`.
-   More information on this Bash script and the data file follows.
-6. If you have EC2 instances that should be ignored, pass a list of their names, or regexes to the `ec2Ignore` script.
-7. Edit `hosts.ini` and enter the instance id(s) of pre-existing EC2 instances, one per line.
-   This file is automatically kept up to date by the `bin/` scripts as you add and remove EC2 and RDS instances.
-8. Run `bin/hosts` to update `hosts.ini`.
-   You also need to do this each time an AWS EC2 instance is restarted unless you have provisioned permanent IP addresses.
+5. Copy the Amazon AWS keys for your existing EC2 instances to the `$ANSIBLE_DATA_DIR` directory.
+6. Add the Amazon AWS keys for your existing EC2 instances that won't be ignored by this project to your local `ssh` repository by running the following:
+````
+    ssh-agent && ssh-add $ANSIBLE_DATA_DIR/foo.pem
+````
+7. If you have EC2 instances that should be ignored, pass a list of their names, or regexes to the [`ec2Ignore` script](EC2.md#ec2ignore).
+   This will cause the domain names of those EC2 instances to be removed from `hosts.ini`.
 
 ## Bash Scripts
 The `bin` directory contains bash scripts for [EC2](EC2.md) and [RDS](RDS.md) operation, and also contains undocumented utility bash scripts.
@@ -135,13 +130,15 @@ The following Ansible scripts are available in the `yaml` directory:
 | `postgresEnv` | Installs Postgres on a generic AWS EC2 instance, as an alternative to using an AWS RDS Postgres instance such as those created by `bin/rdsCreate`. Use `bin/psql` to restore the database before running `playLaunch` |
 
 ## hosts.ini
-This file drives the Ansible scripts.
-It is automatically maintained through the bash scripts in the `bin/` directory.
-This file contains 3 sections:
+This file drives the Ansible scripts to provision various types of servers.
+`hosts.ini` is automatically maintained through the bash scripts in the `bin/` directory.
+Once a server is provisioned it should be removed from `hosts.ini`.
 
-4. A section listing the EC2 domain names of generic EC2 servers: `generic.domains`
-5. A section listing the EC2 domain names of Play servers: `playServer.domains`
-6. A section listing the EC2 domain names of Postgres servers: `postgresServer.domains`
+`hosts.ini` contains 3 sections:
+
+4. A section listing the EC2 domain names of generic EC2 servers to be provioned: `generic.domains`
+5. A section listing the EC2 domain names of Play servers to be provioned: `playServer.domains`
+6. A section listing the EC2 domain names of Postgres servers to be provioned: `postgresServer.domains`
 
 
 ````
@@ -158,7 +155,8 @@ ec2-54-196-57-227.compute-1.amazonaws.com
 
 Note that each entry in the `playServer.domains` and `postgresServer.domains` sections should also appear in the `generic.domains` section.
 
-The `bin/data` command automatically recreates `hosts.ini` from information stored in `$ANSIBLE_DATA_DIR/data/settings`; it is automatically invoked by the `bin/` scripts when adding and deleting servers, or marking servers as `ignored`.
+Implementation note: the internal [`bin/data`](#data) command automatically recreates [`hosts.ini`](#hostsini) from information stored in `$ANSIBLE_DATA_DIR/data/settings`; 
+it is automatically invoked by the [`bin/`](bin) scripts when adding and deleting servers, or marking servers as `ignored`.
 
 ## System Service
 If you are logged into the remote server, you can start, restart and stop the Play application system service like this:
