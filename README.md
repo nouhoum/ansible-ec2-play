@@ -66,67 +66,55 @@ Generic scripts/commands are shown here.
 ### data
 Maintains data/settings
 
+**Options**
 
+    -h        Display help
+    -x        Debug mode
 
-Options are:
-  -h        Display help
-  -x        Debug mode
+**Examples**
 
-Examples:
-  data ignore i-234567
-  data add i-234567 generic userName password publicKey keySignature
-  data remove i-234567
+    data ignore i-234567
+    data add    i-234567 generic userName password publicKey keySignature
+    data remove i-234567
 
 **Usage**
 
-    data [options] operation instanceId [type [parameters]]
+    data [options] operation instanceId [type parameters]
 
 **Where**
 
-<table>
-<thead><tr>
-<th>Option</th>
-<th>Description</th>
-</tr></thead>
-<tbody>
-<tr>
-<td><code>operation</code></td>
-<td>One of <code>add</code>, <code>ignore</code> or <code>remove</code>.</td>
-</tr>
-<tr>
-<td><code>instanceId</code></td>
-<td>The EC2 instance ID to consider</td>
-</tr>
-<tr>
-<td><code>type</code></td>
-<td>is one or more of <code>generic</code>, <code>playServer</code> or <code>postgresServer</code>
-</td>
-<tr>
-<td><code>parameters</code></td>
-<td>
-<table>
-<thead><tr>
-<th>Operation</th>
-<th>Value</th>
-<tbody>
-<tr><td>add</td><td><code>instanceId</code>, <code>userId</code>, <code>password</code>, <code>publicKey</code>, <code>keySignature</code></td></tr>
-<tr><td>remove</td><td><code>instanceId</code></td></tr>
-<tr><td>ignore</td><td>No parameters are necessary</td></tr>
-</tbody>
-</tr></thead>
-</table>
-</td>
-</tr>
-</tbody>
-</table>
+| Option        | Description                         |
+| ------------- | ----------------------------------- |
+| `operation`   | One of `add`, `ignore` or `remove`. |
+| `instanceId`  | The EC2 instance ID to consider.    |
+| `type`        | Only required for the `add` operation. One of: `generic`, `playServer` or `postgresServer`. |
+| `parameters`  | Only required for the `add` operation: All of: `userId`, `password`, `publicKey`, `keySignature` |
 
 ### provisionPlay
 The `bin/provisionPlay` script runs all of the Ansible scripts necessary to provision Play on the EC2 instances with IDs listed in the `playServers` section in `hosts.ini`.
-Options are the same as for the `run` script above.
+Options are the same as for the `run` script below.
 
 ### provisionPostgres
 The `bin/provisionPostgres` script runs all of the Ansible scripts necessary to provision Postgres on the EC2 instances with IDs listed in the `postgresServers` section in `hosts.ini`.
-Options are the same as for the `run` script above.
+Options are the same as for the `run` script below.
+
+### Run
+**Usage**
+
+Run individual Ansible scripts on the hosts with IDs listed in `hosts.ini` like this:
+
+    bin/run [options] scriptName
+
+Where `scriptName` is one of the Ansible scripts below.
+
+**Options**
+
+| Option       | Description                                                     |
+| ------------ | --------------------------------------------------------------- |
+| `-d`         | Dry run, shows commands that would be executed                  |
+| `-h`         | Display help                                                    |
+| `-v`         | increments verbose output (can be specified up to 3 times)      |
+| `-x`         | Debug mode                                                      |
 
 ## Ansible Scripts
 Scripts may contain variables that need to be customized for your specific deployments.
@@ -146,43 +134,31 @@ The following Ansible scripts are available in the `yaml` directory:
 | `playLaunch`  | Launches the deployed Play app, killing the previous instance first if necessary.                                       |
 | `postgresEnv` | Installs Postgres on a generic AWS EC2 instance, as an alternative to using an AWS RDS Postgres instance such as those created by `bin/rdsCreate`. Use `bin/psql` to restore the database before running `playLaunch` |
 
-**Usage**
-
-Run individual Ansible scripts on the hosts with IDs listed in `hosts.ini` like this:
-
-    bin/run [options] scriptName
-
-Where `scriptName` is one of the above Ansible scripts.
-
-**Options**
-
-| Option       | Description                                                     |
-| ------------ | --------------------------------------------------------------- |
-| `-d`         | Dry run, shows commands that would be executed                  |
-| `-h`         | Display help                                                    |
-| `-v`         | increments verbose output (can be specified up to 3 times)      |
-| `-x`         | Debug mode                                                      |
-
 ## hosts.ini
 This file drives the Ansible scripts.
 It is automatically maintained through the bash scripts in the `bin/` directory.
 This file contains 3 sections:
 
 4. A section listing the EC2 domain names of generic EC2 servers: `generic.domains`
-5. A section listing the EC2 domain names of Play servers: `playServers.domains`
-6. A section listing the EC2 domain names of Postgres servers: `postgresServers.domains`
+5. A section listing the EC2 domain names of Play servers: `playServer.domains`
+6. A section listing the EC2 domain names of Postgres servers: `postgresServer.domains`
+
+
+````
+[generic.domains]
+ec2-54-196-57-227.compute-1.amazonaws.com
+ec2-54-196-66-987.compute-1.amazonaws.com
+
+[playServer.domains]
+ec2-54-196-66-987.compute-1.amazonaws.com
+
+[postgresServer.domains]
+ec2-54-196-57-227.compute-1.amazonaws.com
+````
 
 Note that each entry in the `playServer.domains` and `postgresServer.domains` sections should also appear in the `generic.domains` section.
 
 The `bin/data` command automatically recreates `hosts.ini` from information stored in `$ANSIBLE_DATA_DIR/data/settings`; it is automatically invoked by the `bin/` scripts when adding and deleting servers, or marking servers as `ignored`.
-
-````
-[generic.domains]
-
-[playServers.domains]
-
-[postgresServers.domains]
-````
 
 ## System Service
 If you are logged into the remote server, you can start, restart and stop the Play application system service like this:
