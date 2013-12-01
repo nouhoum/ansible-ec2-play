@@ -7,7 +7,7 @@ This project uses EC2 instance IDs to reference EC2 instances, because their IP 
 [An Ansible script](yaml/postgresEnv.yaml) is provided to setup a Postgres database in an EC2 instance.
 Support for AWS RDS Postgres is also provided via the [`bin/rds*`](bin) commands.
 
-[Dependencies](#dependencies) must be installed and [Setup](#setup) must be performed before this project's scripts will work.
+[Dependencies](#dependencies) must be installed and [setup](#setup) must be performed before this project's scripts will work.
 
 
 **WARNING: USE AT YOUR OWN RISK. NO WARRANTY, EXPRESS OR IMPLIED IS PROVIDED.**
@@ -16,15 +16,19 @@ Support for AWS RDS Postgres is also provided via the [`bin/rds*`](bin) commands
 The `bin` directory contains bash scripts for EC2 and RDS operation, and also contains utility bash scripts.
 End user bash scripts are described in the [EC2 bash script documentation page](EC2.md), the [RDS bash script documentation page](RDS.md) and in this section.
 Internal bash scripts invoked by the above are documented [here](INTERNAL.md#bash-scripts).
-Ansible scripts invoked by the bash scripts are documented [here](INTERNAL.md#ansible-scripts).
+Internal Ansible scripts invoked by the bash scripts are documented [here](INTERNAL.md#ansible-scripts).
 
 ### provisionPlay
-The `bin/provisionPlay` script runs the necessary Ansible scripts to provision Play on the EC2 instances with IDs listed in the `playServers` section in [`hosts.ini`](#hostsini).
-Options are the same as for the [`run` script](BASH.md#run).
+The `bin/provisionPlay` bash script runs the necessary Ansible scripts to provision Play on newly created EC2 instances.
+Options are the same as for the internal [`run` script](INTERNAL.md#run).
 
 ### provisionPostgres
-The `bin/provisionPostgres` script runs the necessary Ansible scripts to provision Postgres on the EC2 instances with IDs listed in the `postgresServers` section in `hosts.ini`.
-Options are the same as for the [`run` script](BASH.md#run).
+The `bin/provisionPostgres` bash script runs the necessary Ansible scripts to provision Postgres on newly created EC2 instances.
+Options are the same as for the internal [`run` script](INTERNAL.md#run).
+
+### psql
+The `bin/psql` command can connect to an AWS RDS Postgres database, or a Postgres database created by an Ansible script.
+This command can backup and restore databases to/from a local dump, and it can also provide access to a Postgres command-line interpreter.
 
 ## Play System Service
 If you are logged into an EC2 server that has been provisioned as a Play server, you can start, restart and stop the Play application system service like this:
@@ -33,6 +37,8 @@ If you are logged into an EC2 server that has been provisioned as a Play server,
     sudo service play restart
     sudo service play stop
 
+The [`ec2ssh`](bin/ec2ssh) command provides a conventient way of logging into a server created by the [`ec2Create`](bin/ec2Create) script.
+
 ## Sample Session
 Database servers should be provisioned before the application servers.
 You can either use the [`bin/rdsCreate`](RDS.md#rdscreate) command to create an AWS RDS database, or do the following to create a Postgres database using an Ansible script.
@@ -40,16 +46,17 @@ You can either use the [`bin/rdsCreate`](RDS.md#rdscreate) command to create an 
     # Create an Ubuntu 13.10 micro instance in the default availability zone with the default security group.
     # Define key pair scalaCourses if it does not already exist.
     # Wait for the command to complete before returning.
-    bin/ec2Create -w scalaCoursesDB scalaCourses t1.micro ami-4b143122 postgresServers
+    bin/ec2Create -w scalaCoursesDB scalaCourses t1.micro ami-4b143122 postgresServer
     bin/provisionPostgres
+    bin/psql scalaCoursesDB restore
 
-Regardless of how you provisioned your database, your next step is to provision a Play 2 server:
+Regardless of how you provisioned your database, your next step is to provision a Play 2 server and point it to the `scalaCoursesDB` database you just created:
 
     # Create an Ubuntu 13.10 micro instance in the default availability zone with the default security group.
     # Use the scalaCourses key pair again.
     # Wait for the command to complete before returning.
-    bin/ec2Create -w scalaCoursesPlay scalaCourses t1.micro ami-4b143122 playServers
-    bin/provisionPlay
+    bin/ec2Create -w scalaCoursesPlay scalaCourses t1.micro ami-4b143122 playServer
+    bin/provisionPlay scalaCoursesDB
 
 Each time you run `provisionPostgres` or `provisionPlay` all of the servers mentioned in `hosts.ini` are reprovisioned.
 Provisioning only needs to be done once, so the `ec2Create` bash script causes the contents of `hosts.ini` to be replaced by new server's domain name in the appropriate sections of that file.
