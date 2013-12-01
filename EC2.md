@@ -2,21 +2,21 @@
 
 ## ec2Create
 Creates an EC2 instance and key pair if required.
-The ID of the new EC2 instance is automatically added to `hostIds`.
+The ID of the new EC2 instance is automatically added to `$ANSIBLE_DATA_DIR/data/settings` and `hosts.ini`.
 
 **Usage**
 
-    ec2Create [options] instanceId keyPairName classFQ amiId [groupNames]
+    ec2Create [options] instanceId keyPairName classFQ amiId [types]
 
 Where:
 
 | Option        | Description                                                                                                               |
 | ------------- | ------------------------------------------------------------------------------------------------------------------------- |
 | `amiId`       | AMI image ID listed in [general images](https://aws.amazon.com/marketplace/ref=mkt_ste_amis_redirect?b_k=291) and [Ubuntu images](http://cloud-images.ubuntu.com/releases/13.10/release/), for example: `ami-51274050` |
-| `classFQ`     | is one of the [instance type values](http://aws.amazon.com/ec2/instance-types/#instance-details), for example: `t1.micro` |
-| `keyPairName` | key pair name, which will be created and stored in the `data/` directory if not already defined                           |
-| `groupNames`  | is an optional space-delimited list of groups. Choices are: playServers and postgresServers. If not specified, this will be a generic server. |
-| `instanceId`  | EC2 instance ID                                                                                                           |
+| `classFQ`     | is one of the [instance type values](http://aws.amazon.com/ec2/instance-types/#instance-details), for example: `t1.micro`                             |
+| `keyPairName` | key pair name, which will be created and stored in the `data/` directory if not already defined.                                                      |
+| `types`       | is an optional space-delimited list of types. Choices are: generic, playServers and postgresServers. If not specified, this will be a generic server. |
+| `instanceId`  | EC2 instance ID                                                                                                                                       |
 
 **Options**
 
@@ -42,15 +42,15 @@ Define key pair `testKey` if it does not already exist.
 
 Create a Play server using Ubuntu 13.10 micro image in `us-east-1c`, and wait for the process to complete before returning:
 
-    ec2Create -w testServer testKey t1.micro ami-4b143122 playServers
+    ec2Create -w testServer testKey t1.micro ami-4b143122 playServer
 
 Create a Postgres server using Ubuntu 13.10 micro image in `us-east-1c`, and wait for the process to complete before returning:
 
-    ec2Create -w testServer testKey t1.micro ami-4b143122 postgresServers
+    ec2Create -w testServer testKey t1.micro ami-4b143122 postgresServer
 
 Create a server with Play and Postgres using Ubuntu 13.10 micro image in `us-east-1c`, and wait for the process to complete before returning:
 
-    ec2Create -w testServer testKey t1.micro ami-4b143122 playServers postgresServers
+    ec2Create -w testServer testKey t1.micro ami-4b143122 playServers postgresServer
 
 ## ec2Delete
 Deletes one or more EC2 instance(s).

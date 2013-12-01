@@ -63,21 +63,62 @@ transport=ssh
 The `bin` directory contains bash scripts for [EC2](EC2.md) and [RDS](RDS.md) operation, and also contains undocumented utility bash scripts.
 Generic scripts/commands are shown here.
 
-### hosts
-Command that adds, lists, or removes hostIds to/in/from section(s) in `hosts.ini`.
-Can also silently update the `*.domain` sections from the `*.ids` sections.
+### data
+Maintains data/settings
+
+
+
+Options are:
+  -h        Display help
+  -x        Debug mode
+
+Examples:
+  data ignore i-234567
+  data add i-234567 generic userName password publicKey keySignature
+  data remove i-234567
 
 **Usage**
 
-    hosts action [instanceId] sectionNames
+    data [options] operation instanceId [type [parameters]]
 
 **Where**
 
-| Option         | Description                                                                                                               |
-| -------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| `action`       | One of `add`, `list`, `remove` or `update`. The `list` action also performs an `update`.                                  |
-| `instanceId`   | EC2 instanceId (not required if `action` is `list`)                                                                       |
-| `sectionNames` | is one or more of `generic`, `playServer` or `postgresServer`                                                         |
+<table>
+<thead><tr>
+<th>Option</th>
+<th>Description</th>
+</tr></thead>
+<tbody>
+<tr>
+<td><code>operation</code></td>
+<td>One of <code>add</code>, <code>ignore</code> or <code>remove</code>.</td>
+</tr>
+<tr>
+<td><code>instanceId</code></td>
+<td>The EC2 instance ID to consider</td>
+</tr>
+<tr>
+<td><code>type</code></td>
+<td>is one or more of <code>generic</code>, <code>playServer</code> or <code>postgresServer</code>
+</td>
+<tr>
+<td><code>parameters</code></td>
+<td>
+<table>
+<thead><tr>
+<th>Operation</th>
+<th>Value</th>
+<tbody>
+<tr><td>add</td><td><code>instanceId</code>, <code>userId</code>, <code>password</code>, <code>publicKey</code>, <code>keySignature</code></td></tr>
+<tr><td>remove</td><td><code>instanceId</code></td></tr>
+<tr><td>ignore</td><td>No parameters are necessary</td></tr>
+</tbody>
+</tr></thead>
+</table>
+</td>
+</tr>
+</tbody>
+</table>
 
 ### provisionPlay
 The `bin/provisionPlay` script runs all of the Ansible scripts necessary to provision Play on the EC2 instances with IDs listed in the `playServers` section in `hosts.ini`.
@@ -133,7 +174,7 @@ This file contains 3 sections:
 
 Note that each entry in the `playServer.domains` and `postgresServer.domains` sections should also appear in the `generic.domains` section.
 
-The `bin/hosts` command automatically recreates `hosts.ini` from information stored in `$DATA/settings`; it is automatically invoked by the `bin/` scripts when adding and deleting servers, or marking servers as `ignored`.
+The `bin/data` command automatically recreates `hosts.ini` from information stored in `$ANSIBLE_DATA_DIR/data/settings`; it is automatically invoked by the `bin/` scripts when adding and deleting servers, or marking servers as `ignored`.
 
 ````
 [generic.domains]

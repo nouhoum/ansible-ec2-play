@@ -3,7 +3,7 @@
 function help {
   echo "Creates an EC2 server."
   echo "This operation takes several seconds, during which time the server is not available."
-  echo -e "\nUsage: $(basename $0) [options] instanceId keyPairName classFQ amiId [groupNames]\n"
+  echo -e "\nUsage: $(basename $0) [options] instanceId keyPairName classFQ amiId [types]\n"
   echo "Options are:"
   echo "  -c         Count of instances to launch"
   echo "  -d         Dry run - show command that would be executed"
@@ -19,7 +19,7 @@ function help {
   echo "  amiId is the AMI image ID, documented here: https://aws.amazon.com/marketplace/ref=mkt_ste_amis_redirect?b_k=291 and http://cloud-images.ubuntu.com/releases/13.10/release/, for example: ami-4b143122"
   echo "  classFQ is one of the instance type values documented here: http://aws.amazon.com/ec2/instance-types/#instance-details, for example: t1.micro"
   echo "  instanceId is the EC2 instance ID"
-  echo "  groupNames is an optional space-delimited list of groups. Choices are: playServers and postgresServers. If not specified, this will be a generic server."
+  echo "  types is an optional space-delimited list of type. Choices are: generic, playServer and postgresServer. If not specified, this will be a generic server."
   echo "  keyPairName is the name of the key pair, which will be created and stored in the data/ directory if not already defined"
   echo ""
   echo "Examples:"
@@ -27,13 +27,13 @@ function help {
   echo "  $(basename $0) testServer -w testKey t1.micro ami-4b143122"
   echo ""
   echo "  Create Play server using Ubuntu 13.10 micro image in us-east-1c, and wait for the process to complete before returning:"
-  echo "  $(basename $0) testServer -w testKey t1.micro ami-4b143122 playServers"
+  echo "  $(basename $0) testServer -w testKey t1.micro ami-4b143122 playServer"
   echo ""
   echo "  Create Postgres server using Ubuntu 13.10 micro image in us-east-1c, and wait for the process to complete before returning:"
-  echo "  $(basename $0) testServer -w testKey t1.micro ami-4b143122 postgresServers"
+  echo "  $(basename $0) testServer -w testKey t1.micro ami-4b143122 postgresServer"
   echo ""
   echo "  Create server with Play and Postgres using Ubuntu 13.10 micro image in us-east-1c, and wait for the process to complete before returning:"
-  echo "  $(basename $0) testServer -w testKey t1.micro ami-4b143122 playServers postgresServers"
+  echo "  $(basename $0) testServer -w testKey t1.micro ami-4b143122 playServers postgresServer"
   exit -1
 }
 
@@ -77,7 +77,7 @@ INSTANCE_ID="$1"; shift
 KEY_PAIR_NAME="$1"; shift
 CLASS_FQ="--instance-type $1"; shift
 AMI_ID="$1"; shift
-GROUP_NAMES="ec2Instances $@"
+GROUP_NAMES="generic $@"
 
 KEY_NAME="--key-name $KEY_PAIR_NAME"
 KEY_NAMES="--key-names $KEY_PAIR_NAME"
@@ -93,7 +93,7 @@ JSON=`DO aws ec2 run-instances $IMAGE_ID $AZ $COUNT $CLASS_FQ $DRY $KEY_NAME $OU
 
 INSTANCE_ID=`echo "$JSON" | grep "InstanceId" | cut -d'"' -f4`
 if [ -z "$DRY" ]; then
-  if [ "$GROUP_NAMES" ]; then hosts add $INSTANCE_ID $GROUP_NAMES; fi
+  if [ "$GROUP_NAMES" ]; then data add $INSTANCE_ID $GROUP_NAMES; fi
   if [ "$WAIT" ]; then
     echo -n "Creating..." 
     while [ "$(ec2Status $INSTANCE_ID)" == "pending" ]; do

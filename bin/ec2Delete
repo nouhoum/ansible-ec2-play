@@ -49,18 +49,12 @@ CMD="aws ec2 terminate-instances $DRY --instance-ids $@"
 if [ "$DEBUG" ]; then set -xv; fi
 DO $CMD
   
-if [ -z "$DRY" ]; then  # Remove hostId from list of hostIds
-  touch hostIds
-  HOST_IDS=`cat hostIds`
-  rm -f hostIds
-  for x in $HOST_IDS; do 
-    if [[ ! $@ =~ "$x" ]]; then echo "$x" >> hostIds; fi
-  done
-
+if [ ! -z "$DRY" ]; then
+  for x in $@; do bin/data remove "$x"; fi
   if [ "$WAIT" ]; then
     for x in $@; do
       echo -n "Deleting $x..."
-      WAIT_FOR_TERMINATION $x
+      WAIT_FOR_TERMINATION "$x"
       echo " deleted."
     done
   fi

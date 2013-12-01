@@ -1,12 +1,13 @@
 #!/bin/bash
 
 function help {
-  echo "Maintains $DATA_FILE"
-  echo -e "\nUsage: $(basename $0) [options] operation instanceId [list [parameters]]\n"
+  echo "Maintains $DATA_FILE and hosts.ini"
+  echo -e "\nUsage: $(basename $0) [options] operation instanceId [type [parameters]]\n"
   echo "Where:"
-  echo "  operation is one of add, ignore or remove. Modify is not yet defined or implemented"
+  echo "  operation is one of add, ignore or remove."
+  #echo "  operation is one of add, ignore, modify or remove."
   echo "  instanceId is the EC2 instance ID to consider"
-  echo "  list is one of: generic, playServer or postgresServer"
+  echo "  type is one of: generic, playServer or postgresServer"
   echo "  parameters depends on the operation:"
   echo "    add: instanceId, userId, password, publicKey, keySignature"
   echo "    remove: instanceId"
@@ -57,6 +58,8 @@ while getopts ":hx?" opt; do
   esac
 done
 shift $(($OPTIND-1))
+
+if [ $# -lt 2 ]; then help; fi
 
 if [ "$DEBUG" ]; then set -xv; fi
 
