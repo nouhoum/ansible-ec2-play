@@ -1,5 +1,4 @@
 #!/bin/bash
-# 
 
 function help {
   echo "Display all EC2 instance ids for this AWS account."

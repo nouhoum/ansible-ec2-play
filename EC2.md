@@ -35,7 +35,7 @@ Where:
 
 **Examples**
 
-Create a generic Ubuntu 13.10 micro image in the default availability zone with the default security group, and wait for the process to complete before returning. 
+Create a generic Ubuntu 13.10 micro image in the default availability zone with the default security group, and wait for the process to complete before returning.
 Define key pair `testKey` if it does not already exist.
 
     ec2Create -w testServer testKey t1.micro ami-4b143122
@@ -105,14 +105,14 @@ Domain name must be of the form: `ec2-54-196-57-227.compute-1.amazonaws.com`
 
 ````
 ec2InstanceId i-7cf09e18
-aws ec2 stop-instances --instance-ids 
-aws ec2 start-instances --instance-ids 
+aws ec2 stop-instances --instance-ids
+aws ec2 start-instances --instance-ids
 ````
 
 ## ec2Ids
 Displays all EC2 instance ids for this AWS account.
 
-**Usage** 
+**Usage**
 
     ec2Ids [options]
 
@@ -121,6 +121,21 @@ Displays all EC2 instance ids for this AWS account.
 | Option       | Description                                                                          |
 | ------------ | ------------------------------------------------------------------------------------ |
 | `-g group`   | Only show IDs for the specified group (ec2Instances, playServers or postgresServers) |
+| `-h`         | Display help                                                                         |
+| `-x`         | Debug mode                                                                           |
+
+## ec2Ignore
+Specify the ids of any EC2 instances for this AWS account that should be ignored.
+
+**Usage**
+
+    ec2Ignore [options] instanceIds
+
+Where instanceIds is a space-delimited list of EC2 instance IDs.
+
+**Options**
+
+| Option       | Description                                                                          |
 | `-h`         | Display help                                                                         |
 | `-x`         | Debug mode                                                                           |
 
@@ -141,7 +156,7 @@ Given an EC2 instance id, return the IP address, domain name or status.
 | `-s`         | return status (running or stopped)                              |
 | `-x`         | Debug mode                                                      |
 
-## ec2InstanceId 
+## ec2InstanceId
 Given an EC2 domain name or IP address, returns the EC2 instance id.
 Domain name must be of the form: `ec2-54-196-57-227.compute-1.amazonaws.com`.
 
@@ -162,8 +177,8 @@ Domain name must be of the form: `ec2-54-196-57-227.compute-1.amazonaws.com`.
 
 ````
 ec2InstanceId i-7cf09e18
-aws ec2 stop-instances --instance-ids 
-aws ec2 start-instances --instance-ids 
+aws ec2 stop-instances --instance-ids
+aws ec2 start-instances --instance-ids
 ````
 
 ## ec2Status

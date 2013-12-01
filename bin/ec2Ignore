@@ -1,0 +1,25 @@
+#!/bin/bash
+
+function help {
+  echo "Specify the ids of any EC2 instances for this AWS account that should be ignored."
+  echo -e "\nUsage: $(basename $0) [options] instanceIds\n"
+  echo "Where instanceIds is a space-delimited list of EC2 instance IDs"
+  echo "Options are:"
+  echo "  -h        Display help"
+  echo "  -x        Debug mode"
+  exit -1
+}
+
+while getopts ":hx?" opt; do
+  case $opt in
+    x) DEBUG=true ;;
+    *) help       ;;
+  esac
+done
+shift $(($OPTIND-1))
+
+if [ "$#" -eq 0 ]; then help; fi
+
+if [ "$DEBUG" ]; then set -xv; fi
+
+for x in $@; do data add ignore $f; done

@@ -15,16 +15,16 @@ Install and configure the following.
 
 * [Ansible](https://github.com/ansible/ansible)
 * [jq](http://stedolan.github.io/jq/download/), a lightweight and flexible command-line JSON processor.
-* [AWS command-line toolkit](http://aws.amazon.com/developertools/2928). 
+* [AWS command-line toolkit](http://aws.amazon.com/developertools/2928).
 [General AWS command-line documentation](http://aws.amazon.com/cli/).
 [AWS RDS command-line documentation](http://docs.aws.amazon.com/AmazonRDS/latest/CommandLineReference/Welcome.html).
 
-## Steps
+## Setup
 
 1. If the git repository that holds your Play project is private and therefore requires authentication:
 
   a. Run the following on every EC2 instance as root (not sure how to automate this)
-    
+
     i. GitHub
 ````
 ssh-keyscan github.com >> /etc/ssh/ssh_known_hosts
@@ -43,27 +43,33 @@ to this:
 ````
 transport=ssh
 ````
-3. Edit `yaml/config/postfix_selections` to set domains for email 
+3. Edit `yaml/config/postfix_selections` to set domains for email
 4. Add the Amazon AWS keys for your EC2 instances to your local `ssh` repository by running the following:
-```` 
+````
     ssh-agent && ssh-add ~/path/to/foo.pem
 ````
-6. Run `bin/hostIni` to create or update `hosts.ini`.  
-   You also need to do this each time an AWS EC2 instance is restarted unless you have provisioned permanent IP addresses.
-5. Edit `hostIds` and enter the instance id(s) of pre-existing EC2 instances, one per line. 
+5. Set the `ANSIBLE_DATA_DIR` environment variable to define the location of the directory to read/write your data from/to.
+   If the variable is not set, a directory called `data` will be created for this purpose within this project.
+5. Run `bin/hosts` to create `hosts.ini`.
+   If you have already defined EC2 instances their instanceIds will be placed into `ec2Instances.ids`.
+   More information on this Bash script and the data file follows.
+6. If you have EC2 instances that should be ignored, pass a list of their names, or regexes to the `ec2Ignore` script.
+7. Edit `hosts.ini` and enter the instance id(s) of pre-existing EC2 instances, one per line.
    This file is automatically kept up to date by the `bin/` scripts as you add and remove EC2 and RDS instances.
+8. Run `bin/hosts` to update `hosts.ini`.
+   You also need to do this each time an AWS EC2 instance is restarted unless you have provisioned permanent IP addresses.
 
 ## Bash Scripts
 The `bin` directory contains bash scripts for [EC2](EC2.md) and [RDS](RDS.md) operation, and also contains undocumented utility bash scripts.
 Generic scripts/commands are shown here.
 
 ### hosts
-Command that adds, lists, or removes hostIds to/in/from section(s) in `hosts.ini`. 
+Command that adds, lists, or removes hostIds to/in/from section(s) in `hosts.ini`.
 Can also silently update the `*.domain` sections from the `*.ids` sections.
 
 **Usage**
 
-    hosts action [instanceId] sectionNames 
+    hosts action [instanceId] sectionNames
 
 **Where**
 
@@ -71,7 +77,7 @@ Can also silently update the `*.domain` sections from the `*.ids` sections.
 | -------------- | ------------------------------------------------------------------------------------------------------------------------- |
 | `action`       | One of `add`, `list`, `remove` or `update`. The `list` action also performs an `update`.                                  |
 | `instanceId`   | EC2 instanceId (not required if `action` is `list`)                                                                       |
-| `sectionNames` | is one or more of `ec2Instance`, `playServer` or `postgresServer`                                                         |
+| `sectionNames` | is one or more of `generic`, `playServer` or `postgresServer`                                                         |
 
 ### provisionPlay
 The `bin/provisionPlay` script runs all of the Ansible scripts necessary to provision Play on the EC2 instances with IDs listed in the `playServers` section in `hosts.ini`.
@@ -82,8 +88,8 @@ The `bin/provisionPostgres` script runs all of the Ansible scripts necessary to 
 Options are the same as for the `run` script above.
 
 ## Ansible Scripts
-Scripts may contain variables that need to be customized for your specific deployments. 
-Commonly modified variables have been factored into `bin/custom.sample`. 
+Scripts may contain variables that need to be customized for your specific deployments.
+Commonly modified variables have been factored into `bin/custom.sample`.
 Make a copy of that file and save as `bin/custom` before modifying.
 
     cp bin/custom{.sample,}
@@ -119,36 +125,18 @@ Where `scriptName` is one of the above Ansible scripts.
 ## hosts.ini
 This file drives the Ansible scripts.
 It is automatically maintained through the bash scripts in the `bin/` directory.
-This file contains 6 sections: 
+This file contains 3 sections:
 
-1. A section listing the EC2 instanceIDs of generic EC2 servers: `ec2Instances.ids` 
-2. A section listing the EC2 instanceIDs of Play servers: `playServers.ids`
-3. A section listing the EC2 instanceIDs of Postgres servers: `postgresServers.ids`
-4. A section listing the EC2 domain names of generic EC2 servers: `ec2Instance.domains` 
+4. A section listing the EC2 domain names of generic EC2 servers: `generic.domains`
 5. A section listing the EC2 domain names of Play servers: `playServers.domains`
 6. A section listing the EC2 domain names of Postgres servers: `postgresServers.domains`
 
-Note that each entry in the `playServer.ids` and `postgresServer.ids` sections should also appear in the `ec2Instance.ids` section.
-Similarly, each entry in the `playServer.domains` and `postgresServer.domains` sections should also appear in the `ec2Instance.domains` section.
+Note that each entry in the `playServer.domains` and `postgresServer.domains` sections should also appear in the `generic.domains` section.
 
-The `bin/hosts` command updates the three `*.domain` sections from the corresponding `*.ids` sections, removes dead entries, and is automatically invoked by the `bin/` scripts when adding and deleting servers.
+The `bin/hosts` command automatically recreates `hosts.ini` from information stored in `$DATA/settings`; it is automatically invoked by the `bin/` scripts when adding and deleting servers, or marking servers as `ignored`.
 
 ````
-[ec2Instances.ids]
-i-8ae6adf1
-i-06c83262
-i-9cd52ff8
-i-f0560794
-i-12136369
-
-[playServers.ids]
-i-f0560794
-i-12136369
-
-[postgresServers.ids]
-i-8ae6adf1
-
-[ec2Instance.domains]
+[generic.domains]
 
 [playServers.domains]
 
@@ -168,7 +156,7 @@ Database servers should be provisioned before the application servers.
     # Create an Ubuntu 13.10 micro instance in the default availability zone with the default security group.
     # Define key pair scalaCourses if it does not already exist.
     # Wait for the command to complete before returning.
-    bin/ec2Create -w scalaCoursesDB scalaCourses t1.micro ami-4b143122 postgresServers 
+    bin/ec2Create -w scalaCoursesDB scalaCourses t1.micro ami-4b143122 postgresServers
     bin/provisionPostgres
 
     # Create an Ubuntu 13.10 micro instance in the default availability zone with the default security group.
