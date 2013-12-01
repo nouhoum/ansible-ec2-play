@@ -59,63 +59,17 @@ transport=ssh
 
 ## Bash Scripts
 The `bin` directory contains bash scripts for [EC2](EC2.md) and [RDS](RDS.md) operation, and also contains utility bash scripts.
-End user bash scripts are described in this section.
-Internal bash script are documented [here](BASH.md).
+End user bash scripts are described in the [EC2 bash script documentation page](EC2.md), the [RDS bash script documentation page](RDS.md) and in this section.
+Internal bash scripts invoked by the above are documented [here](INTERNAL.md#bash-scripts).
+Ansible scripts invoked by the bash scripts are documented [here](INTERNAL.md#ansible-scripts).
 
 ### provisionPlay
-The `bin/provisionPlay` script runs the necessary Ansible scripts to provision Play on the EC2 instances with IDs listed in the `playServers` section in `hosts.ini`.
-Options are the same as for the `run` script below.
+The `bin/provisionPlay` script runs the necessary Ansible scripts to provision Play on the EC2 instances with IDs listed in the `playServers` section in [`hosts.ini`](#hostsini).
+Options are the same as for the [`run` script](BASH.md#run).
 
 ### provisionPostgres
 The `bin/provisionPostgres` script runs the necessary Ansible scripts to provision Postgres on the EC2 instances with IDs listed in the `postgresServers` section in `hosts.ini`.
-Options are the same as for the `run` script below.
-
-## Ansible Scripts
-Scripts may contain variables that need to be customized for your specific deployments.
-Commonly modified variables have been factored into `bin/custom.sample`.
-Make a copy of that file and save as `bin/custom` before modifying.
-
-    cp bin/custom{.sample,}
-
-The following Ansible scripts are available in the `yaml` directory:
-
-| Name          | Description                                                                                                             |
-| ------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| `bootstrap`   | Sets up an EC2 Ubuntu AMI.                                                                                              |
-| `playEnv`     | Installs Play dependencies such as `pvm` and `java`.                                                                    |
-| `playService` | Defines a system service for the Play application.                                                                      |
-| `playDeploy`  | Clones a Play project from a Git repository and deploys it on the machine.                                              |
-| `playLaunch`  | Launches the deployed Play app, killing the previous instance first if necessary.                                       |
-| `postgresEnv` | Installs Postgres on a generic AWS EC2 instance, as an alternative to using an AWS RDS Postgres instance such as those created by `bin/rdsCreate`. Use `bin/psql` to restore the database before running `playLaunch` |
-
-## hosts.ini
-This file drives the Ansible scripts to provision various types of servers.
-`hosts.ini` is automatically maintained through the bash scripts in the `bin/` directory.
-Once a server is provisioned it should be removed from `hosts.ini`.
-
-`hosts.ini` contains 3 sections:
-
-4. A section listing the EC2 domain names of generic EC2 servers to be provioned: `generic.domains`
-5. A section listing the EC2 domain names of Play servers to be provioned: `playServer.domains`
-6. A section listing the EC2 domain names of Postgres servers to be provioned: `postgresServer.domains`
-
-
-````
-[generic.domains]
-ec2-54-196-57-227.compute-1.amazonaws.com
-ec2-54-196-66-987.compute-1.amazonaws.com
-
-[playServer.domains]
-ec2-54-196-66-987.compute-1.amazonaws.com
-
-[postgresServer.domains]
-ec2-54-196-57-227.compute-1.amazonaws.com
-````
-
-Note that each entry in the `playServer.domains` and `postgresServer.domains` sections should also appear in the `generic.domains` section.
-
-Implementation note: the internal [`bin/data`](#data) command automatically recreates [`hosts.ini`](#hostsini) from information stored in `$ANSIBLE_DATA_DIR/data/settings`; 
-it is automatically invoked by the [`bin/`](bin) scripts when adding and deleting servers, or marking servers as `ignored`.
+Options are the same as for the [`run` script](BASH.md#run).
 
 ## System Service
 If you are logged into the remote server, you can start, restart and stop the Play application system service like this:
@@ -141,6 +95,9 @@ Regardless of how you provisioned your database, your next step is to provision 
     # Wait for the command to complete before returning.
     bin/ec2Create -w scalaCoursesPlay scalaCourses t1.micro ami-4b143122 playServers
     bin/provisionPlay
+
+Each time you run `provisionPostgres` or `provisionPlay` all of the servers mentioned in `hosts.ini` are reprovisioned.
+Provisioning only needs to be done once, so the `ec2Create` bash script causes the contents of `hosts.ini` to be replaced by new server's domain name in the appropriate sections of that file.
 
 ## References
 * [The original source which inspired most of these Ansible scripts](https://github.com/phred/5minbootstrap)
