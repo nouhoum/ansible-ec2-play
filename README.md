@@ -59,7 +59,7 @@ transport=ssh
 
 ## Bash Scripts
 The `bin` directory contains bash scripts for [EC2](EC2.md) and [RDS](RDS.md) operation, and also contains utility bash scripts.
-End user bash scripts are shown here.
+End user bash scripts are described in this section.
 Internal bash script are documented [here](BASH.md).
 
 ### provisionPlay

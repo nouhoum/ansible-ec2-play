@@ -1,7 +1,7 @@
 # Bash Scripts
+These are internal bash scripts that users need not know about.
 
 ### data
-This is an internal script that users need not know about.
 Maintains `$ANSIBLE_DATA_DIR/data/settings`.
 
 **Options**
@@ -29,13 +29,15 @@ Maintains `$ANSIBLE_DATA_DIR/data/settings`.
     data remove i-234567
 
 ### Run
-**Usage**
+Runs individual Ansible scripts on the hosts with IDs listed in `hosts.ini`.
 
-Run individual Ansible scripts on the hosts with IDs listed in `hosts.ini` like this:
+**Usage**
 
     bin/run [options] scriptName
 
-Where `scriptName` is one of the Ansible scripts below.
+**Where**
+
+`scriptName` is one of the [Ansible scripts](README.md#ansible-scripts).
 
 **Options**
 
