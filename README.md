@@ -169,7 +169,7 @@ If you are logged into the remote server, you can start, restart and stop the Pl
 
 ## Sample Session
 Database servers should be provisioned before the application servers.
-You can either use the `bin/rdsCreate` command to create an AWS RDS database, or do the following to create a Postgres database using an Ansible script.
+You can either use the [`bin/rdsCreate`](RDS.md#rdscreate) command to create an AWS RDS database, or do the following to create a Postgres database using an Ansible script.
 
     # Create an Ubuntu 13.10 micro instance in the default availability zone with the default security group.
     # Define key pair scalaCourses if it does not already exist.
@@ -186,7 +186,7 @@ Regardless of how you provisioned your database, your next step is to provision 
     bin/provisionPlay
 
 ## References
-* [The original source which inspired most of these scripts](https://github.com/phred/5minbootstrap)
+* [The original source which inspired most of these Ansible scripts](https://github.com/phred/5minbootstrap)
 * [My first 5 minutes on a server](http://plusbryan.com/my-first-5-minutes-on-a-server-or-essential-security-for-linux-servers)
 * [A blog post that the author of the preceding article wrote](http://practicalops.com/my-first-5-minutes-on-a-server.html)
 
