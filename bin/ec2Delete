@@ -49,7 +49,7 @@ CMD="aws ec2 terminate-instances $DRY --instance-ids $@"
 if [ "$DEBUG" ]; then set -xv; fi
 DO $CMD
   
-if [ ! -z "$DRY" ]; then
+if [ -z "$DRY" ]; then
   for x in $@; do bin/data remove "$x"; fi
   if [ "$WAIT" ]; then
     for x in $@; do
