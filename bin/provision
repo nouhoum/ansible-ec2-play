@@ -1,0 +1,75 @@
+#!/bin/bash
+
+function help {
+  echo "Execute Ansible scripts to create and set up all server types using Ansible scripts: generic Ubuntu, Play and Postgres"
+  echo -e "\nUsage: $(basename $0) [options]\n"
+  echo "Options can include:"
+  echo "    -d causes the script to be dry run"
+  echo "    -h Display help information"
+  echo "    -v increments verbose output (can be specified up to 3 times)"
+  echo "    -x debug mode"
+  exit -1
+}
+
+while getopts "dhvx?" opt; do
+  case $opt in
+    h ) help            ;;
+    \?) help            ;;
+  esac
+done
+shift $(($OPTIND-1))
+
+$DEBUG
+
+# Generic Ubuntu servers
+run "$@" bootstrap
+RC=$?
+if [ 0 == $RC ]; then 
+  echo "Generic servers have been provisioned. TODO Remove Contents from generic.domains section of hosts.ini"
+else
+  echo "Error: Generic server provisioning failed"
+fi
+
+# Postgres servers
+if [ $RC == 0 ]; then 
+  run "$@" postgresEnv
+  RC=$?
+fi
+if [ $RC == 0 ]; then 
+  echo "Postgres servers have been provisioned. TODO Remove Contents from postgres.domains section of hosts.ini"
+  echo "TODO Run psql now to restore the database"
+else
+  echo "Error: Postgres server provisioning failed"
+fi
+
+if [ $RC == 0 ]; then 
+  run "$@" playEnv
+  RC=$?
+fi
+
+if [ $RC == 0 ]; then 
+  run "$@" playService
+  RC=$?
+else
+  echo "Error: Play server environment setup(s) failed"
+fi
+
+if [ $RC == 0 ]; then 
+  run "$@" playDeploy
+  RC=$?
+else
+  echo "Error: Installation of Play application service(s) failed"
+fi
+
+if [ $RC == 0 ]; then 
+  run "$@" playLaunch
+else
+  echo "Error: Play application deployment to server(s) failed"
+fi
+
+if [ $RC == 0 ]; then 
+  echo "Postgres servers have been provisioned. TODO Remove Contents from play.domains section of hosts.ini"
+  echo "All done!"
+else
+  echo "Error: Play application launch(es) failed"
+fi

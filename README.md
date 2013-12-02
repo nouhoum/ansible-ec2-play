@@ -47,8 +47,10 @@ You can either use the [`bin/rdsCreate`](RDS.md#rdscreate) command to create an 
     # Define key pair scalaCourses if it does not already exist.
     # Wait for the command to complete before returning.
     bin/ec2Create -w scalaCoursesDB scalaCourses t1.micro ami-4b143122 postgresServer
-    bin/provisionPostgres
     bin/psql scalaCoursesDB restore
+
+We could provision the Postgres server now, or we could do it later, with the Play server.
+You decide.
 
 Regardless of how you provisioned your database, your next step is to provision a Play 2 server and point it to the `scalaCoursesDB` database you just created:
 
@@ -56,10 +58,14 @@ Regardless of how you provisioned your database, your next step is to provision 
     # Use the scalaCourses key pair again.
     # Wait for the command to complete before returning.
     bin/ec2Create -w scalaCoursesPlay scalaCourses t1.micro ami-4b143122 playServer
-    bin/provisionPlay scalaCoursesDB
 
-Each time you run `provisionPostgres` or `provisionPlay` all of the servers mentioned in `hosts.ini` are reprovisioned.
-Provisioning only needs to be done once, so the `ec2Create` bash script causes the contents of `hosts.ini` to be replaced by new server's domain name in the appropriate sections of that file.
+Might as well provision both servers now:
+
+    bin/provision
+
+Each time you run `provision` all of the servers that have been defined since the last time the script was run will are reprovisioned.
+Provisioning of a server only needs to be done once, so the `provision` bash script empties the contents of `hosts.ini`.
+`hosts.ini` is a temporary file that accumulates the domain names of servers that have been created but have not yet been provisioned.
 
 ## Dependencies
 
