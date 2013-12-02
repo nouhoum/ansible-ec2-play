@@ -18,12 +18,8 @@ End user bash scripts are described in the [EC2 bash script documentation page](
 Internal bash scripts invoked by the above are documented [here](INTERNAL.md#bash-scripts).
 Internal Ansible scripts invoked by the bash scripts are documented [here](INTERNAL.md#ansible-scripts).
 
-### provisionPlay
-The `bin/provisionPlay` bash script runs the necessary Ansible scripts to provision Play on newly created EC2 instances.
-Options are the same as for the internal [`run` script](INTERNAL.md#run).
-
-### provisionPostgres
-The `bin/provisionPostgres` bash script runs the necessary Ansible scripts to provision Postgres on newly created EC2 instances.
+### provision
+The `bin/provision` bash script runs the necessary Ansible scripts to provision Generic Ubuntu servers running on newly created EC2 instances, and provisions Postgres and/or Play on them as required.
 Options are the same as for the internal [`run` script](INTERNAL.md#run).
 
 ### psql
