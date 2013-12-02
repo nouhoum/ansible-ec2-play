@@ -50,7 +50,7 @@ if [ "$DEBUG" ]; then set -xv; fi
 DO $CMD
   
 if [ -z "$DRY" ]; then
-  for x in $@; do bin/data remove "$x"; fi
+  for x in $@; do bin/data remove "$x"; done
   if [ "$WAIT" ]; then
     for x in $@; do
       echo -n "Deleting $x..."
