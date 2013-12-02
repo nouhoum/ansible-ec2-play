@@ -124,21 +124,6 @@ Displays all EC2 instance ids for this AWS account.
 | `-h`         | Display help                                                                         |
 | `-x`         | Debug mode                                                                           |
 
-## ec2Ignore
-Specify the ids of any EC2 instances for this AWS account that should be ignored.
-
-**Usage**
-
-    ec2Ignore [options] instanceIds
-
-Where instanceIds is a space-delimited list of EC2 instance IDs.
-
-**Options**
-
-| Option       | Description                                                                          |
-| `-h`         | Display help                                                                         |
-| `-x`         | Debug mode                                                                           |
-
 ## ec2Info
 Given an EC2 instance id, return the IP address, domain name or status.
 

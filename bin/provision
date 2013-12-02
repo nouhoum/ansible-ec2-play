@@ -37,7 +37,7 @@ if [ $RC == 0 ]; then
 fi
 if [ $RC == 0 ]; then 
   echo "Postgres servers have been provisioned. TODO Remove Contents from postgres.domains section of hosts.ini"
-  echo "TODO Run psql now to restore the database"
+  #TODO psql restore for each RDS Postgres server and each server mentioned in the postgres.domains section of hosts.ini
 else
   echo "Error: Postgres server provisioning failed"
 fi

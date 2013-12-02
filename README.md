@@ -19,7 +19,7 @@ Internal bash scripts invoked by the above are documented [here](INTERNAL.md#bas
 Internal Ansible scripts invoked by the bash scripts are documented [here](INTERNAL.md#ansible-scripts).
 
 ### provision
-The `bin/provision` bash script runs the necessary Ansible scripts to provision Generic Ubuntu servers running on newly created EC2 instances, and provisions Postgres and/or Play on them as required.
+The `bin/provision` bash script runs the necessary Ansible scripts to provision generic Ubuntu servers running on newly created EC2 instances, and provisions Postgres and/or Play on them as required.
 Options are the same as for the internal [`run` script](INTERNAL.md#run).
 
 ### psql
