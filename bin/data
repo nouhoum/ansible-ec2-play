@@ -1,22 +1,22 @@
 #!/bin/bash
 
 function help {
+  if [ "$1" ]; then echo -e "Error: $1\n"; fi
   echo "Maintains $DATA_FILE and hosts.ini"
   echo -e "\nUsage: $(basename $0) [options] operation instanceId [type [parameters]]\n"
   echo "Where:"
-  echo "  operation is one of add, ignore or remove."
+  echo "  operation is one of add or remove."
   #echo "  operation is one of add, ignore, modify or remove."
   echo "  instanceId is the EC2 instance ID to consider"
   echo "  type is only required for the add operation. One of: generic, playServer or postgresServer"
-  echo "  parameters are only required for the add operation. All of: userId, password, publicKey and keySignature"
+  echo "  parameters are only required for the add operation. All of: userId, password and keyPairName"
   echo ""
   echo "Options are:"
   echo "  -h        Display help"
   echo "  -x        Debug mode"
   echo ""
   echo "Examples:"
-  echo "  data ignore i-234567"
-  echo "  data add    i-234568 generic userName password publicKey keySignature"
+  echo "  data add    i-234568 generic userName password keyPairName"
   echo "  data remove i-234567"
   exit -1
 }
@@ -24,8 +24,7 @@ function help {
 function NEW_SERVER {
   cat <<EOF
 {
-  `if [ "$6" ]; then echo " \"keySignature\": \"$6\", "; fi`
-  `if [ "$5" ]; then echo " \"publicKey\":\"$5\", "; fi`
+  `if [ "$5" ]; then echo " \"keyPairName\":\"$5\", "; fi`
   `if [ "$4" ]; then echo " \"password\":\"$4\", "; fi`
   `if [ "$3" ]; then echo " \"user\":\"$3\", "; fi`
   "type":"$2",
@@ -39,7 +38,7 @@ function TYPE_IDS {
 }
 
 function TEST_TYPE {
-  if [ ! "$3" =~ "generic playServer postgresServer" ]; then
+  if [[ ! "generic playServer postgresServer" =~ "$3" ]]; then
     echo -e "Error: $3 is an unknown type"
     help
   fi
@@ -71,16 +70,15 @@ DATA="$(cat "$DATA_FILE")"
 
 case "$1" in
   add)
-    if [ $# -ne 7 ]; then help; fi
+    if [ $# -eq 1 ]; then help "Missing instanceId, type, userId, password and keyPairName"; fi
+    if [ $# -eq 2 ]; then help "Missing type, userId, password and keyPairName"; fi
+    if [ $# -eq 3 ]; then help "Missing userId, password and keyPairName"; fi
+    if [ $# -eq 4 ]; then help "Missing password and keyPairName"; fi
+    if [ $# -eq 5 ]; then help "Missing keyPairName"; fi
+    if [ $# -gt 6 ]; then help "Too many arguments were supplied"; fi
     TEST_TYPE $@
     # TODO check for an entry with the given instanceId and delete it if found
-    echo "$DATA" | jq ". += [`NEW_SERVER $2 $3 $4 $5 $6 $7`]" > $DATA_FILE
-    ;;
-
-  ignore)
-    if [ $# -ne 2 ]; then help; fi
-    # TODO check for an entry with the given instanceId and delete it if found
-    echo "$DATA" | jq ". += [`NEW_SERVER $2 $3`]" > $DATA_FILE
+    echo "$DATA" | jq ". += [`NEW_SERVER $2 $3 $4 $5 $6`]" > $DATA_FILE
     ;;
 
   modify) # Not defined or implemented; must edit data/settings manually

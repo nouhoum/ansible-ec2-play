@@ -3,7 +3,7 @@
 function help {
   echo "Creates an EC2 server."
   echo "This operation takes several seconds, during which time the server is not available."
-  echo -e "\nUsage: $(basename $0) [options] instanceId keyPairName classFQ amiId [types]\n"
+  echo -e "\nUsage: $(basename $0) [options] instanceId keyPairName classFQ amiId type userId password\n"
   echo "Options are:"
   echo "  -c         Count of instances to launch"
   echo "  -d         Dry run - show command that would be executed"
@@ -16,24 +16,27 @@ function help {
   echo "  -x         Debug mode"
   echo "  -z string  Availability Zone; defaults to us-east-1c. See http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-regions-availability-zones.html"
   echo -e "\nWhere:"
-  echo "  amiId is the AMI image ID, documented here: https://aws.amazon.com/marketplace/ref=mkt_ste_amis_redirect?b_k=291 and http://cloud-images.ubuntu.com/releases/13.10/release/, for example: ami-4b143122"
-  echo "  classFQ is one of the instance type values documented here: http://aws.amazon.com/ec2/instance-types/#instance-details, for example: t1.micro"
-  echo "  instanceId is the EC2 instance ID"
-  echo "  types is an optional space-delimited list of type. Choices are: generic, playServer and postgresServer. If not specified, this will be a generic server."
-  echo "  keyPairName is the name of the key pair, which will be created and stored in the data/ directory if not already defined"
+  echo "  instanceId   is the EC2 instance ID"
+  echo "  keyPairName  is the name of the key pair, which will be created and stored in the data/ directory if not already defined"
+  echo "  classFQ      is one of the instance type values documented here: http://aws.amazon.com/ec2/instance-types/#instance-details, for example: t1.micro"
+  echo "  amiId        is the AMI image ID, documented here: https://aws.amazon.com/marketplace/ref=mkt_ste_amis_redirect?b_k=291 and http://cloud-images.ubuntu.com/releases/13.10/release/, for example: ami-4b143122"
+  echo "  type         One of: generic, playServer or postgresServer."
+  echo "  userId       Ubuntu user id."
+  echo "  password     Ubuntu user's password."
   echo ""
   echo "Examples:"
-  echo "  Create generic Ubuntu 13.10 micro image in us-east-1c, and wait for the process to complete before returning:"
-  echo "  $(basename $0) testServer -w testKey t1.micro ami-4b143122"
+  echo "  Create generic Ubuntu 13.10 micro image in us-east-1c, and wait for the process to complete before returning."
+  echo "  Ubuntu user name fred has password yabbadabbadoo:"
+  echo "  $(basename $0) -w testServer testKey t1.micro ami-4b143122 fred yabbadabbadoo"
   echo ""
   echo "  Create Play server using Ubuntu 13.10 micro image in us-east-1c, and wait for the process to complete before returning:"
-  echo "  $(basename $0) testServer -w testKey t1.micro ami-4b143122 playServer"
+  echo "  $(basename $0) -w testServer testKey t1.micro ami-4b143122 playServer fred yabbadabbadoo"
   echo ""
   echo "  Create Postgres server using Ubuntu 13.10 micro image in us-east-1c, and wait for the process to complete before returning:"
-  echo "  $(basename $0) testServer -w testKey t1.micro ami-4b143122 postgresServer"
+  echo "  $(basename $0) -w testServer testKey t1.micro ami-4b143122 postgresServer fred yabbadabbadoo"
   echo ""
   echo "  Create server with Play and Postgres using Ubuntu 13.10 micro image in us-east-1c, and wait for the process to complete before returning:"
-  echo "  $(basename $0) testServer -w testKey t1.micro ami-4b143122 playServers postgresServer"
+  echo "  $(basename $0) -w testServer testKey t1.micro ami-4b143122 playServers postgresServer fred yabbadabbadoo"
   exit -1
 }
 
@@ -62,30 +65,35 @@ while getopts ":c:de:xp:qs:u:z:wh?" opt; do
     s) SECURITY_GROUP="--security-groups $OPTARG" ;;
     u) USER="-u $OPTARG"                          ;;
     w) WAIT=true                                  ;;
-    x) DEBUG=true                                 ;;
+    x) DEBUG="-x"                                 ;;
     z) AZ="--placement AvailabilityZone=$OPTARG"  ;;
     *) help                                       ;;
   esac
 done
 shift $(($OPTIND-1))
 
-if [ $# -lt 4 ]; then help; fi
+if [ $# -lt 6 ]; then help; fi
 
 if [ "$DEBUG" ]; then set -xv; fi
+
+if [ -z "$ANSIBLE_DATA_DIR" ]; then ANSIBLE_DATA_DIR=.; fi
 
 INSTANCE_ID="$1"; shift
 KEY_PAIR_NAME="$1"; shift
 CLASS_FQ="--instance-type $1"; shift
 AMI_ID="$1"; shift
-GROUP_NAMES="generic $@"
+TYPE="$1"; shift
+USER_ID="$1"; shift
+PASSWORD="$1"; shift
 
 KEY_NAME="--key-name $KEY_PAIR_NAME"
 KEY_NAMES="--key-names $KEY_PAIR_NAME"
+PUBLIC_KEY_FILE_NAME=$ANSIBLE_DATA_DIR/$KEY_PAIR_NAME.pem
 IMAGE_ID="--image-id $AMI_ID"
 
 trap '' SIGTERM
 if [[ "$(aws ec2 describe-key-pairs $KEY_NAMES 2>&1)" == *"does not exist" ]]; then
-  DO aws ec2 create-key-pair --query KeyMaterial --output text $DRY $KEY_NAME $QUIET > data/$KEY_PAIR_NAME.pem
+  DO aws ec2 create-key-pair $DRY $KEY_NAME > $PUBLIC_KEY_FILE_NAME
 fi
 trap - SIGTERM
 
@@ -93,7 +101,7 @@ JSON=`DO aws ec2 run-instances $IMAGE_ID $AZ $COUNT $CLASS_FQ $DRY $KEY_NAME $OU
 
 INSTANCE_ID=`echo "$JSON" | grep "InstanceId" | cut -d'"' -f4`
 if [ -z "$DRY" ]; then
-  if [ "$GROUP_NAMES" ]; then data add $INSTANCE_ID $GROUP_NAMES; fi
+  data $DEBUG add $INSTANCE_ID $TYPE $USER_ID $PASSWORD $KEY_PAIR_NAME
   if [ "$WAIT" ]; then
     echo -n "Creating..." 
     while [ "$(ec2Status $INSTANCE_ID)" == "pending" ]; do
