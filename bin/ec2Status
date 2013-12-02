@@ -16,6 +16,8 @@ while getopts "dxhw?" opt; do
 done
 shift $(($OPTIND-1))
 
+set -e
+
 if [ "$#" -lt 1 ]; then help; fi
 if [ "$DEBUG" ]; then set -xv; fi
 

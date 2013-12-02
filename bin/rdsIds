@@ -19,6 +19,8 @@ while getopts "dxh?" opt; do
 done
 shift $(($OPTIND-1))
 
+set -e
+
 if [ "$#" -ne 0 ]; then help; fi
 
 CMD="aws rds describe-db-instances"

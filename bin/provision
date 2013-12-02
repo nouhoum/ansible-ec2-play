@@ -11,6 +11,8 @@ function help {
   exit -1
 }
 
+set -e
+
 while getopts "dhvx?" opt; do
   case $opt in
     h ) help            ;;

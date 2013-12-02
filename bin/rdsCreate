@@ -42,6 +42,8 @@ function classFQ {
   esac
 }
 
+set -e
+
 if [ $# -lt 6 ]; then help; fi
 
 ACCESSIBILITY="--publicly-accessible"

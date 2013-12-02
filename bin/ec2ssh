@@ -15,6 +15,8 @@ while getopts "dh?" opt; do
 done
 shift $(($OPTIND-1))
 
+set -e
+
 if [ $# -ne 1 ]; then help; fi
 
 source custom

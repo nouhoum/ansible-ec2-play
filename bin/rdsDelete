@@ -29,6 +29,8 @@ while getopts "dxhw?" opt; do
 done
 shift $(($OPTIND-1))
 
+set -e
+
 if [ "$#" -ne 1 ]; then help; fi
 
 CMD="aws rds delete-db-instance --db-instance-identifier $1 -f --skip-final-snapshot"

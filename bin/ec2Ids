@@ -10,6 +10,8 @@ function help {
   exit -1
 }
 
+set -e
+
 while getopts ":g:hx?" opt; do
   case $opt in
     g) GROUP=$OPTARG ;;

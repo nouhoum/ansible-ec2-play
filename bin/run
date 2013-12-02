@@ -12,7 +12,30 @@ function help {
   echo ""
   echo "Where:"
   echo "  script is one of $SCRIPTS"
+  echo ""
+  echo "This script makes an attempt to install missing dependencies for Mac and Ubuntu"
   exit -1
+}
+
+function CHECK_PACKAGE {
+  if [ -z "$(which $1)" ]; then
+    case $(uname -v) in
+      *Ubuntu*)
+        echo "$1 is not installed, installing it now."
+        sudo apt-get install $2 -qy
+        ;;
+
+      *Darwin*)
+        echo "$1 is not installed, installing it now."
+        brew install $2
+        ;;
+
+      *)
+        echo "Error: $1 is not installed, please install it and try again."
+        exit -3
+       ;;
+    esac
+  fi
 }
 
 # Make the root directory of this project current
@@ -38,12 +61,17 @@ if [ "$verbose" ]; then echo "Running from $(pwd)"; fi
 if [ -f bin/custom ]; then
   source bin/custom
 else
-  echo "Error: bin/custom does not exist. Create it by typing the following:"
-  echo "cp bin/custom{.sample,}"
-  echo ""
-  echo "After creating it, edit bin/custom as required, then run this command again"
+  cp bin/custom{.sample,}
+  echo "Error: bin/custom does not exist. A sample file has just been created for you."
+  echo "Edit the file as required, then run this command again."
   exit -2
 fi
+
+CHECK_PACKAGE ansible-playbook ansible
+CHECK_PACKAGE jq jq
+CHECK_PACKAGE pip python-pip
+if [ -z "$(which pip)" ]; then easy_install pip; fi
+if [ -z "$(which awscli)" ]; then pip install awscli; fi
 
 $TRACE
 ansible-playbook $DRYRUN $verbose -i hosts.ini yaml/$1.yaml -u ubuntu

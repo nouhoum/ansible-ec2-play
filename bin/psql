@@ -13,6 +13,8 @@ if [ "$1" == "-c" ]; then
   shift
 fi
 
+set -e
+
 source defineCmds
 source dbCommon
 

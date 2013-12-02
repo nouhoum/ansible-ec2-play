@@ -44,6 +44,8 @@ function TEST_TYPE {
   fi
 }
 
+set -e
+
 if [ -z "$ANSIBLE_DATA_DIR" ]; then ANSIBLE_DATA_DIR=data; fi
 DATA_FILE=$ANSIBLE_DATA_DIR/settings
 

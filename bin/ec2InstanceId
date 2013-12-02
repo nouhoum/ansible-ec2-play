@@ -17,6 +17,8 @@ function help {
   exit -1
 }
 
+set -e
+
 if [ $# == 0 ] || [ $# -gt 2 ]; then help; fi
 
 INFO=PublicIpAddress
