@@ -42,7 +42,8 @@ You can either use the [`bin/rdsCreate`](RDS.md#rdscreate) command to create an 
     # Create an Ubuntu 13.10 micro instance in the default availability zone with the default security group.
     # Define key pair scalaCourses if it does not already exist.
     # Wait for the command to complete before returning.
-    bin/ec2Create -w scalaCoursesDB scalaCourses t1.micro ami-4b143122 postgresServer
+    # Ubuntu user name is fred with password yabbadabbadoo.
+    bin/ec2Create -w scalaCoursesDB scalaCourses t1.micro ami-4b143122 postgresServer fred yabbadabbadoo
     bin/psql scalaCoursesDB restore
 
 We could provision the Postgres server now, or we could do it later, with the Play server.
@@ -53,7 +54,8 @@ Regardless of how you provisioned your database, your next step is to provision 
     # Create an Ubuntu 13.10 micro instance in the default availability zone with the default security group.
     # Use the scalaCourses key pair again.
     # Wait for the command to complete before returning.
-    bin/ec2Create -w scalaCoursesPlay scalaCourses t1.micro ami-4b143122 playServer
+    # Ubuntu user name is fred with password yabbadabbadoo.
+    bin/ec2Create -w scalaCoursesPlay scalaCourses t1.micro ami-4b143122 playServer fred yabbadabbadoo
 
 Might as well provision both servers now:
 
