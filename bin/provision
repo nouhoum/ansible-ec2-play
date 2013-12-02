@@ -15,16 +15,17 @@ set -e
 
 while getopts "dhvx?" opt; do
   case $opt in
-    h ) help            ;;
-    \?) help            ;;
+    h ) help       ;;
+    x ) DEBUG="-x" ;;
+    \?) help       ;;
   esac
 done
 shift $(($OPTIND-1))
 
-$DEBUG
+if [ "$DEBUG" ]; then set -xv; fi
 
 # Generic Ubuntu servers
-run "$@" bootstrap
+bin/run $DEBUG "$@" bootstrap
 RC=$?
 if [ 0 == $RC ]; then 
   echo "Generic servers have been provisioned. TODO Remove Contents from generic.domains section of hosts.ini"
@@ -34,7 +35,7 @@ fi
 
 # Postgres servers
 if [ $RC == 0 ]; then 
-  run "$@" postgresEnv
+  bin/run $DEBUG "$@" postgresEnv
   RC=$?
 fi
 if [ $RC == 0 ]; then 
@@ -45,26 +46,26 @@ else
 fi
 
 if [ $RC == 0 ]; then 
-  run "$@" playEnv
+  bin/run $DEBUG "$@" playEnv
   RC=$?
 fi
 
 if [ $RC == 0 ]; then 
-  run "$@" playService
+  bin/run $DEBUG "$@" playService
   RC=$?
 else
   echo "Error: Play server environment setup(s) failed"
 fi
 
 if [ $RC == 0 ]; then 
-  run "$@" playDeploy
+  bin/run $DEBUG "$@" playDeploy
   RC=$?
 else
   echo "Error: Installation of Play application service(s) failed"
 fi
 
 if [ $RC == 0 ]; then 
-  run "$@" playLaunch
+  bin/run $DEBUG "$@" playLaunch
 else
   echo "Error: Play application deployment to server(s) failed"
 fi
