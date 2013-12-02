@@ -6,7 +6,7 @@ function help {
   echo "Options can include:"
   echo "    -d causes the script to be dry run"
   echo "    -h Display help information"
-  echo "    -v Increments verbose output (can be specified up to 3 times)"
+  echo "    -v Increments VERBOSE output (can be specified up to 3 times)"
   echo "    -x Debug mode"
   SCRIPTS="$(cd yaml; for s in *.yaml; do echo -n "$COMMA ${s:0:${#s} - 5}"; COMMA=","; done)"
   echo ""
@@ -42,13 +42,13 @@ function CHECK_PACKAGE {
 DIR="$( cd "$( dirname "${bash_source[0]}" )" && pwd )"
 cd $DIR
 
-verbose=""
+VERBOSE=""
 while getopts "dhstvx?" opt; do
   case $opt in
     d ) DRYRUN="--check" ;;
     h ) help ;;
     x ) DEBUG="-x" ;;
-    v ) verbose="-v $verbose" ;;
+    v ) VERBOSE="-v $VERBOSE" ;;
     \?) help ;;
   esac
 done
@@ -56,9 +56,15 @@ shift $(($OPTIND-1))
 
 if [ -z "$1" ]; then help; fi
 
-if [ "$verbose" ]; then echo "Running from $(pwd)"; fi
+if [ "$VERBOSE" ]; then echo "Running from $(pwd)"; fi
 
 if [ "$DEBUG" ]; then set -xv; fi
+
+CHECK_PACKAGE ansible-playbook ansible
+CHECK_PACKAGE jq jq
+CHECK_PACKAGE pip python-pip
+if [ -z "$(which pip)" ]; then easy_install pip; fi
+if [ -z "$(which aws)" ]; then pip install awscli; fi
 
 if [ -f bin/custom ]; then
   source bin/custom
@@ -69,15 +75,12 @@ else
   exit -2
 fi
 
-CHECK_PACKAGE ansible-playbook ansible
-CHECK_PACKAGE jq jq
-CHECK_PACKAGE pip python-pip
-if [ -z "$(which pip)" ]; then easy_install pip; fi
-if [ -z "$(which aws)" ]; then pip install awscli; fi
-
 if [[ `cat hosts.ini | wc -w` == 3 ]]; then
   echo "Error: hosts.ini is empty. You need to create servers with the ec2Create command before attempting to provision them."
   exit -4
 fi
 
-ansible-playbook $DRYRUN $verbose -i hosts.ini yaml/$1.yaml -u ubuntu
+# TODO ping the servers to verify that they are up and issue a nice error message if not. ansible's error message is not helpfu:
+# fatal: [i-e3365d9b] => {'msg': 'FAILED: [Errno -2] Name or service not known', 'failed': True}
+# TODO read Ubuntu userid from data/settings and pass it instead of using 'ubuntu'
+ansible-playbook $DRYRUN $VERBOSE -i hosts.ini yaml/$1.yaml -u ubuntu

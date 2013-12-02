@@ -57,9 +57,9 @@ Regardless of how you provisioned your database, your next step is to provision 
     # Ubuntu user name is fred with password yabbadabbadoo.
     bin/ec2Create -w scalaCoursesPlay scalaCourses t1.micro ami-4b143122 playServer fred yabbadabbadoo
 
-Might as well provision both servers now:
+Might as well provision both servers now. It is a good idea to use medium verbosity:
 
-    bin/provision
+    bin/provision -vv
 
 Each time you run `provision` all of the servers that have been defined since the last time the script was run will are reprovisioned.
 Provisioning of a server only needs to be done once, so the `provision` bash script empties the contents of `hosts.ini`.

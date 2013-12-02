@@ -75,23 +75,73 @@ done
 shift $(($OPTIND-1))
 
 if [ $# -lt 6 ]; then help; fi
-
 if [ "$DEBUG" ]; then set -xv; fi
 
 if [ -z "$ANSIBLE_DATA_DIR" ]; then ANSIBLE_DATA_DIR=.; fi
 
-INSTANCE_ID="$1"; shift
-KEY_PAIR_NAME="$1"; shift
-CLASS_FQ="--instance-type $1"; shift
-AMI_ID="$1"; shift
-TYPE="$1"; shift
-USER_ID="$1"; shift
-PASSWORD="$1"; shift
+if [ -z "$1" ]; then 
+  echo -e "Error: instanceId must be specified.\n"
+  help
+else 
+  INSTANCE_ID="$1"
+  shift
+fi
 
-KEY_NAME="--key-name $KEY_PAIR_NAME"
-KEY_NAMES="--key-names $KEY_PAIR_NAME"
-PUBLIC_KEY_FILE_NAME=$ANSIBLE_DATA_DIR/$KEY_PAIR_NAME.pem
-IMAGE_ID="--image-id $AMI_ID"
+if [ -z "$1" ]; then 
+  echo -e "Error: keyPairName must be specified.\n"
+  help
+else 
+  KEY_PAIR_NAME="$1"
+  KEY_NAME="--key-name $KEY_PAIR_NAME"
+  KEY_NAMES="--key-names $KEY_PAIR_NAME"
+  PUBLIC_KEY_FILE_NAME=$ANSIBLE_DATA_DIR/$KEY_PAIR_NAME.pem
+  shift
+fi
+
+if [ -z "$1" ]; then 
+  echo -e "Error: class must be specified.\n"
+  help
+else 
+  CLASS_FQ="--instance-type $1"
+  shift
+fi
+
+if [ -z "$1" ]; then 
+  echo -e "Error: AMI ID must be specified.\n"
+  help
+else 
+  AMI_ID="$1"
+  IMAGE_ID="--image-id $AMI_ID"
+  shift
+fi
+
+if [ -z "$1" ]; then 
+  echo -e "Error: type must be specified.\n"
+  help
+else 
+  if [[ ! "generic playServer postgresServer" =~ "$1" ]]; then
+    echo -e "Error: type '$1' is invalid; must be one of generic, playServer or postgresServer.\n"
+    help
+  fi
+  TYPE="$1"
+  shift
+fi
+
+if [ -z "$1" ]; then 
+  echo -e "Error: userId must be specified.\n"
+  help
+else
+  USER_ID="$1"
+  shift
+fi
+
+if [ -z "$1" ]; then 
+  echo -e "Error: password must be specified.\n"
+  help
+else 
+  PASSWORD="$1"
+  shift
+fi
 
 trap '' SIGTERM
 if [[ "$(aws ec2 describe-key-pairs $KEY_NAMES 2>&1)" == *"does not exist" ]]; then

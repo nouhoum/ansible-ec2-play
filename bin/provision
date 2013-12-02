@@ -15,9 +15,10 @@ set -e
 
 while getopts "dhvx?" opt; do
   case $opt in
-    h ) help       ;;
-    x ) DEBUG="-x" ;;
-    \?) help       ;;
+    h ) help                  ;;
+    x ) DEBUG="-x"            ;;
+    v ) VERBOSE="-v $VERBOSE" ;;
+    \?) help                  ;;
   esac
 done
 shift $(($OPTIND-1))
@@ -25,7 +26,7 @@ shift $(($OPTIND-1))
 if [ "$DEBUG" ]; then set -xv; fi
 
 # Generic Ubuntu servers
-bin/run $DEBUG "$@" bootstrap
+bin/run $DEBUG $VERBOSE "$@" bootstrap
 RC=$?
 if [ 0 == $RC ]; then 
   echo "Generic servers have been provisioned. TODO Remove Contents from generic.domains section of hosts.ini"
@@ -35,7 +36,7 @@ fi
 
 # Postgres servers
 if [ $RC == 0 ]; then 
-  bin/run $DEBUG "$@" postgresEnv
+  bin/run $DEBUG $VERBOSE "$@" postgresEnv
   RC=$?
 fi
 if [ $RC == 0 ]; then 
@@ -46,26 +47,26 @@ else
 fi
 
 if [ $RC == 0 ]; then 
-  bin/run $DEBUG "$@" playEnv
+  bin/run $DEBUG $VERBOSE "$@" playEnv
   RC=$?
 fi
 
 if [ $RC == 0 ]; then 
-  bin/run $DEBUG "$@" playService
+  bin/run $DEBUG $VERBOSE "$@" playService
   RC=$?
 else
   echo "Error: Play server environment setup(s) failed"
 fi
 
 if [ $RC == 0 ]; then 
-  bin/run $DEBUG "$@" playDeploy
+  bin/run $DEBUG $VERBOSE "$@" playDeploy
   RC=$?
 else
   echo "Error: Installation of Play application service(s) failed"
 fi
 
 if [ $RC == 0 ]; then 
-  bin/run $DEBUG "$@" playLaunch
+  bin/run $DEBUG $VERBOSE "$@" playLaunch
 else
   echo "Error: Play application deployment to server(s) failed"
 fi
