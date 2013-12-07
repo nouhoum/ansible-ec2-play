@@ -2,7 +2,8 @@
 This is a set of Ansible scripts to deploy Play 2.2+ web applications in EC2 instances.
 The EC2 instances for Play should be 'small' or larger; 'micro' instances are not able to compile Play applications.
 Play applications are run as a system service.
-This project uses EC2 instance IDs to reference EC2 instances, because their IP addresses and DNS names change on every restart unless you have provisioned permanent IP addresses.
+This project uses EC2 instance IDs to reference EC2 instances,
+because their IP addresses and DNS names change on every restart unless you have provisioned permanent IP addresses.
 
 [An Ansible script](yaml/postgresEnv.yaml) is provided to setup a Postgres database in an EC2 instance.
 Support for AWS RDS Postgres is also provided via the [`bin/rds*`](bin) commands.
