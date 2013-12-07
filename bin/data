@@ -22,12 +22,16 @@ function help {
 }
 
 function NEW_SERVER {
+  case $2 in
+    generic) TYPES="[ { \"generic\" : \"notProvisioned\" } ]" ;;
+          *) TYPES="[ { \"generic\" : \"notProvisioned\" }, { \"$2\" : \"notProvisioned\" } ]" ;;
+  esac
   cat <<EOF
 {
   `if [ "$5" ]; then echo " \"keyPairName\":\"$5\", "; fi`
   `if [ "$4" ]; then echo " \"password\":\"$4\", "; fi`
   `if [ "$3" ]; then echo " \"user\":\"$3\", "; fi`
-  "type":"$2",
+  "types":$TYPES,
   "instanceId":"$1"
 }
 EOF
@@ -61,11 +65,11 @@ if [ $# -lt 2 ]; then help; fi
 
 if [ "$DEBUG" ]; then set -xv; fi
 
-EMPTY_DATA='[]'
+EMPTY_DATA=\[\]
 
 if [ ! -d "$ANSIBLE_DATA_DIR" ]; then mkdir -p "$ANSIBLE_DATA_DIR"; fi
 if [ ! -f "$DATA_FILE" ] || [ ! -s "$DATA_FILE" ]; then
-  echo "$EMPTY_DATA | jq ." > "$DATA_FILE"
+  echo "$EMPTY_DATA" | jq . > "$DATA_FILE"
 fi
 
 DATA="$(cat "$DATA_FILE")"
@@ -80,7 +84,9 @@ case "$1" in
     if [ $# -gt 6 ]; then help "Too many arguments were supplied"; fi
     TEST_TYPE $@
     # TODO check for an entry with the given instanceId and delete it if found
-    echo "$DATA" | jq ". += [`NEW_SERVER $2 $3 $4 $5 $6`]" > $DATA_FILE
+    CONTENTS="$DATA"
+    if [ -z "$CONTENTS" ]; then CONTENTS="$EMPTY_DATA"; fi
+    echo "$CONTENTS" | jq ". += [`NEW_SERVER $2 $3 $4 $5 $6`]" > $DATA_FILE
     ;;
 
   modify) # Not defined or implemented; must edit data/settings manually

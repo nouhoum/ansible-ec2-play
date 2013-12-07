@@ -52,6 +52,30 @@ Runs individual Ansible scripts on the hosts with IDs listed in `hosts.ini`.
 | `-v`         | Increments verbose output (can be specified up to 3 times)      |
 | `-x`         | Debug mode                                                      |
 
+## data/settings
+This file contiains configuration information about all the servers created from the `ec2Create` and `rdsCreate` commands.
+It is updated by the `provision` command and is referred to by the `psql` and ec2ssh commands. Here is a sample file:
+
+````
+[
+  {
+    "instanceId": "i-345678",
+    "user": "myUserName",
+    "password": "myPassword",
+    "publicKey": "myPublicKey",
+    "keySignature": "myKeySignature",
+    "types": [
+      {"generic": "provisioned"},
+      {"postgresServer": "notProvisionedYet"},
+      {"playServer": "provisioned"}
+    ]
+  }
+]
+````
+Three types of servers are handled: `generic`, `playServer` and `postgresServer`.
+Each of these servers can have two states: `provisioned` and `notProvisioned`.
+The `bin/provision` command creates `hosts.ini` and populates it with servers that are `notProvisioned` in the appropriate sections of that temporary file.
+
 ## Ansible Scripts
 Scripts may contain variables that need to be customized for your specific deployments.
 Commonly modified variables have been factored into [`bin/custom.sample`](bin/custom.sample).
@@ -71,9 +95,8 @@ The following Ansible scripts are available in the [`yaml` directory](yaml):
 | `postgresEnv` | Installs Postgres on a generic AWS EC2 instance, as an alternative to using an AWS RDS Postgres instance such as those created by `bin/rdsCreate`. Use `bin/psql` to restore the database before running `playLaunch` |
 
 ## hosts.ini
-`hosts.ini` drives the Ansible scripts to provision various types of servers.
-This file is automatically maintained through the bash scripts in the [`bin/`](bin) directory.
-Once a server is provisioned by one of the [bash scripts](README.md#bash-scripts) it is automatically removed from `hosts.ini`.
+`hosts.ini` is a temporary file that drives the Ansible scripts to provision various types of servers.
+This file is automatically created when the `bin/provision` bash script runs, and is deleted at the end of that script.
 
 `hosts.ini` contains 3 sections:
 
@@ -96,18 +119,17 @@ ec2-54-196-57-227.compute-1.amazonaws.com
 
 Note that each entry in the `playServer.domains` and `postgresServer.domains` sections should also appear in the `generic.domains` section.
 
-Implementation note: the internal [`bin/data`](#data) command automatically creates [`hosts.ini`](#hostsini) from information stored in `$ANSIBLE_DATA_DIR/data/settings`; 
-it is automatically invoked by the [`bin/`](bin) scripts when creating a new server.
+Implementation note: the internal [`bin/data`](#data) command automatically creates [`hosts.ini`](#hostsini) from information stored in `$ANSIBLE_DATA_DIR/data/settings`.
 
 ## EC2 Public Key Files
-The file type for EC2 public key files is `pem` and it contains JSON. 
+The file type for EC2 public key files is `pem` and it contains JSON.
 Here is a sample file, which must be located in `$ANSIBLE_DATA_DIR/test.pem`, according to the `KeyName` property in the file:
 
 
 ````
 {
-    "KeyMaterial": "-----BEGIN RSA PRIVATE KEY-----\nMIIEowIBAAKCAQEApA8k8RpLFMUqsjz8FioiUSedLL7+YkxnsR4Y8G6y8+zVPpwXTI7h4dkeTxVA\nUe+zKEu4y5yQytt9qRg9a4OWksqEgF0/PK2WcMxJyXMJcCP96ZD86rHv/lQrjxUsPh6LnhQYvRoO\nwBnW+QaevjBNPcXbyC8NBWmxUM8Yuuy8eW9V+82OqB6T81UhnZTbBdYxskUHjXNnGs91JBJWfMcz\nlujcrP39GDydO19kSS/Y+yS3FgvQocf31V20OmON71Egk+1+goVmdAWlpt39TmCoQ5vLn1R0Y+CP\nb8CJRir1VT7S1ksbKvLqiF2dbWuxVxpxiMiyfcgxt6NoXBdZARzVCwIDAQABAoIBAEPeoAG+RuFI\nz+j8oazpsVixcqxYNxSjVyJGuTp+ETon9+/20wyw73FnSMqemAVNjGhXKxPQqXXCZ7HUfVRFE72W\nWkpgSRDpHxt65+uW04i42woNGRRemFI2r+55a9wm9stmtPVGGmQOTIio3HMBuHKdr9aY4GIk3132\nztxFo5L4enwjElek+fvDz2SF0l9CbMxU8z6WPnscqeLnVmuY79+zdER2zMz9s51x4uXm664HyvjA\nTzP36eIOS0P6N4v1337bvEb6Up4zchWcpTPaknNIzFpYhC1KyC0iktHy0WrvQvhwkzEqz+2lmXIA\nd7e+47l07nUMj1GP5OB7Is94mEECgYEA1Z7WUgNhkK3TrfZy8VtBNAMe8cWOG6MvrNba5Ua4qQel\n1PBal/Xb/N+aD4j41NwKLPFv6ngVBmvDWaXISPEAMHktheI+LKluH+crdLOJXs5WhjhwibshX+xM\nmZVMDcwmtjjCzXJuqLHqovnIwUoWchlXSfeZzsdxO8UDNcXON0cCgYEAxJs7ib4gLfGabNnrr8GA\nGqCNpwIL2NzQ6So7DjpeWkjUGitF8SWaGwDYlxNdmfFyFEw8V+IsIIeqZK5jkHk93pxEllMqqDlG\nKi+oTzDc0TiVHmT0szwOhmIwocSby2GBbqcq+q//50M/eDoiNC8/afD8P7bzWYOA5mlNXV8n3h0C\ngYEAoSh9g83tMxsQkTNWL+OqYzTfiYKC3TLVas2EwmgCM/MDFoxlrDLdTf7a2VF6eAuw2Ysj5X3G\nTtvJur4pRW4buHYS8+hlA4im/gaGcDpqLk34VLYLoLy+RwGcIFnT0Kztn5dez2O/PCFNZLqQy9G6\n8UVQ5wqWzLsGIBNXgp/CHU0CgYAOKaSLUp/cz2exaa1ZttW0lVY+7p3N3HJMKZehecDsPgzRacab\nDXthcJkpoOKAQW1XWvqJ1igZm8xBfnJ7qNA1JgqmzYzoG2Abj91O/xUZGTtcuicKdkwRkCcysAgN\nCZQaVX56Go2Tqjt7PKzUF4c46XwyVsqG6zsw3esNy9oCXQKBgChsJxDfbMsFgsyuSygRZFGHJjYL\nq00uXeHRXfqGf2/OkbFBA6zhB9pPCWDIlBm43B/1VrULdVF5hN+MsptPUxS2tpy8JU3+9JrXCR8k\n0Ou8rpFSakGXxtClL9yN86qH3O3ngK0m2Zn2RJZZOe+1PUgLRYHKy9Fa8NYeQcWdGCmg\n-----END RSA PRIVATE KEY-----", 
-    "KeyName": "test", 
+    "KeyMaterial": "-----BEGIN RSA PRIVATE KEY-----\nMIIEowIBAAKCAQEApA8k8RpLFMUqsjz8FioiUSedLL7+YkxnsR4Y8G6y8+zVPpwXTI7h4dkeTxVA\nUe+zKEu4y5yQytt9qRg9a4OWksqEgF0/PK2WcMxJyXMJcCP96ZD86rHv/lQrjxUsPh6LnhQYvRoO\nwBnW+QaevjBNPcXbyC8NBWmxUM8Yuuy8eW9V+82OqB6T81UhnZTbBdYxskUHjXNnGs91JBJWfMcz\nlujcrP39GDydO19kSS/Y+yS3FgvQocf31V20OmON71Egk+1+goVmdAWlpt39TmCoQ5vLn1R0Y+CP\nb8CJRir1VT7S1ksbKvLqiF2dbWuxVxpxiMiyfcgxt6NoXBdZARzVCwIDAQABAoIBAEPeoAG+RuFI\nz+j8oazpsVixcqxYNxSjVyJGuTp+ETon9+/20wyw73FnSMqemAVNjGhXKxPQqXXCZ7HUfVRFE72W\nWkpgSRDpHxt65+uW04i42woNGRRemFI2r+55a9wm9stmtPVGGmQOTIio3HMBuHKdr9aY4GIk3132\nztxFo5L4enwjElek+fvDz2SF0l9CbMxU8z6WPnscqeLnVmuY79+zdER2zMz9s51x4uXm664HyvjA\nTzP36eIOS0P6N4v1337bvEb6Up4zchWcpTPaknNIzFpYhC1KyC0iktHy0WrvQvhwkzEqz+2lmXIA\nd7e+47l07nUMj1GP5OB7Is94mEECgYEA1Z7WUgNhkK3TrfZy8VtBNAMe8cWOG6MvrNba5Ua4qQel\n1PBal/Xb/N+aD4j41NwKLPFv6ngVBmvDWaXISPEAMHktheI+LKluH+crdLOJXs5WhjhwibshX+xM\nmZVMDcwmtjjCzXJuqLHqovnIwUoWchlXSfeZzsdxO8UDNcXON0cCgYEAxJs7ib4gLfGabNnrr8GA\nGqCNpwIL2NzQ6So7DjpeWkjUGitF8SWaGwDYlxNdmfFyFEw8V+IsIIeqZK5jkHk93pxEllMqqDlG\nKi+oTzDc0TiVHmT0szwOhmIwocSby2GBbqcq+q//50M/eDoiNC8/afD8P7bzWYOA5mlNXV8n3h0C\ngYEAoSh9g83tMxsQkTNWL+OqYzTfiYKC3TLVas2EwmgCM/MDFoxlrDLdTf7a2VF6eAuw2Ysj5X3G\nTtvJur4pRW4buHYS8+hlA4im/gaGcDpqLk34VLYLoLy+RwGcIFnT0Kztn5dez2O/PCFNZLqQy9G6\n8UVQ5wqWzLsGIBNXgp/CHU0CgYAOKaSLUp/cz2exaa1ZttW0lVY+7p3N3HJMKZehecDsPgzRacab\nDXthcJkpoOKAQW1XWvqJ1igZm8xBfnJ7qNA1JgqmzYzoG2Abj91O/xUZGTtcuicKdkwRkCcysAgN\nCZQaVX56Go2Tqjt7PKzUF4c46XwyVsqG6zsw3esNy9oCXQKBgChsJxDfbMsFgsyuSygRZFGHJjYL\nq00uXeHRXfqGf2/OkbFBA6zhB9pPCWDIlBm43B/1VrULdVF5hN+MsptPUxS2tpy8JU3+9JrXCR8k\n0Ou8rpFSakGXxtClL9yN86qH3O3ngK0m2Zn2RJZZOe+1PUgLRYHKy9Fa8NYeQcWdGCmg\n-----END RSA PRIVATE KEY-----",
+    "KeyName": "test",
     "KeyFingerprint": "d9:b0:0f:ec:85:cc:a9:15:19:be:0b:ac:e8:67:27:55:e0:a7:0d:b5"
 }
 ````
