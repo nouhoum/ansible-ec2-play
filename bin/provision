@@ -12,10 +12,13 @@ function help {
 }
 
 function TYPE_IDS {
-  echo "$DATA" | jq -r "[.[]|select(.types[].$1 == \"notProvisioned\")|.instanceId]|sort|unique|.[]"
+  #echo "$DATA" | jq -r "[.[]|select(.types[].$1 == \"notProvisioned\")|.instanceId]|sort|unique|.[]"
+  echo "$DATA" | jq -r "[.[]|select(.types[].$1 == \"notProvisioned\")|.instanceId]|.[]"
 }
 
-# TODO translate type-id to domain name for hosts.ini
+function DNS_NAMES {
+  for h in `TYPE_IDS $1`; do ec2Info -n $h; done
+}
 
 set -e
 
@@ -37,15 +40,15 @@ DATA_FILE=$ANSIBLE_DATA_DIR/settings
 DATA="$(cat "$DATA_FILE")"
 
 echo "[generic.domains]" > hosts.ini
-TYPE_IDS generic >> hosts.ini
-TYPE_IDS playServers >> hosts.ini
-TYPE_IDS postgresServers >> hosts.ini
+DNS_NAMES generic >> hosts.ini
+DNS_NAMES playServers >> hosts.ini
+DNS_NAMES postgresServers >> hosts.ini
 
 echo -e "\n[playServer.domains]" >> hosts.ini
-TYPE_IDS playServers >> hosts.ini
+DNS_NAMES playServers >> hosts.ini
 
 echo -e "\n[postgresServer.domains]" >> hosts.ini
-TYPE_IDS postgresServers >> hosts.ini
+DNS_NAMES postgresServers >> hosts.ini
 
 
 # Generic Ubuntu servers

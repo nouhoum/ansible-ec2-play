@@ -80,7 +80,7 @@ if [[ `cat hosts.ini | wc -w` == 3 ]]; then
   exit -4
 fi
 
-# TODO ping the servers to verify that they are up and issue a nice error message if not. ansible's error message is not helpfu:
+# TODO ping the servers to verify that they are up and issue a nice error message if not. ansible's error message is not helpful:
 # fatal: [i-e3365d9b] => {'msg': 'FAILED: [Errno -2] Name or service not known', 'failed': True}
 # TODO read Ubuntu userid from data/settings and pass it instead of using 'ubuntu'
 ansible-playbook $DRYRUN $VERBOSE -i hosts.ini yaml/$1.yaml -u ubuntu
