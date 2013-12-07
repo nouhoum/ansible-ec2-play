@@ -10,10 +10,10 @@ function help {
   exit -1
 }
 
-while getopts "xh?" opt; do
+while getopts "xwh?" opt; do
   case $opt in
-    x) DEBUG=true ;;
     w) WAIT=true  ;;
+    x) DEBUG="-x" ;;
     *) help       ;;
   esac
 done
@@ -23,13 +23,15 @@ set -e
 
 if [ $# -ne 1 ]; then help; fi
 
-aws ec2 start-instances --instance-ids $@
+aws ec2 start-instances --instance-ids $@ > /dev/null
 
 if [ "$WAIT" ]; then
-  echo -n "Starting..." 
-  while [ "$(ec2Status $INSTANCE_ID)" != "running" ]; do
-    echo -n "."
-    sleep 5
+  for S in $@; do
+    echo -n "Starting $S..."
+    while [ "$(ec2Status $DEBUG $S)" != "running" ]; do
+      echo -n "."
+      sleep 5
+    done
+    echo " running."
   done
-  echo " running."
 fi
