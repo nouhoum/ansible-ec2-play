@@ -56,18 +56,18 @@ function DO {
 AZ="--placement AvailabilityZone=us-east-1c"
 COUNT="--count 1"
 OUTPUT="--output json"
-PASSWORD="-p blahblah"
-USER="-u devops"
+ROOT_PASSWORD="blahblah"
+ROOT_USER="devops"
 USER_DATA="--user-data HowToUseThis"
 
 while getopts ":c:de:xp:qs:u:z:wh?" opt; do
   case $opt in
     c) COUNT="--count $OPTARG"                    ;;
     d) DRY="--dry-run"                            ;;
-    p) PASSWORD="-p $OPTARG"                      ;;
+    p) ROOT_PASSWORD="$OPTARG"                    ;;
     q) QUIET=true                                 ;;
     s) SECURITY_GROUP="--security-groups $OPTARG" ;;
-    u) USER="-u $OPTARG"                          ;;
+    u) ROOT_USER="$OPTARG"                        ;;
     w) WAIT=true                                  ;;
     x) DEBUG="-x"                                 ;;
     z) AZ="--placement AvailabilityZone=$OPTARG"  ;;
@@ -138,7 +138,7 @@ else
 fi
 
 if [ -z "$1" ]; then
-  echo -e "Error: password must be specified.\n"
+  echo -e "Error: user password must be specified.\n"
   help
 else
   PASSWORD="$1"
@@ -158,10 +158,11 @@ if [[ "$(aws ec2 describe-key-pairs $KEY_NAMES 2>&1)" == *"does not exist" ]]; t
 fi
 trap - SIGTERM
 
-JSON=`DO aws ec2 run-instances $IMAGE_ID $AZ $COUNT $CLASS_FQ $DRY $KEY_NAME $OUTPUT $SECURITY_GROUP $QUIET`
+JSON=`DO aws ec2 run-instances -u $ROOT_USER -p $ROOT_PASSWORD $IMAGE_ID $AZ $COUNT $CLASS_FQ $DRY $KEY_NAME $OUTPUT $SECURITY_GROUP $QUIET`
 
 INSTANCE_ID=`echo "$JSON" | grep "InstanceId" | cut -d'"' -f4`
 if [ -z "$DRY" ]; then
+  # TODO add ROOT_USER and ROOT_PWD
   data $DEBUG add $INSTANCE_ID $TYPE $USER_ID $PASSWORD $KEY_PAIR_NAME $DESCRIPTION
   if [ "$WAIT" ]; then
     echo -n "Creating..."
