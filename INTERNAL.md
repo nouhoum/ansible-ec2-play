@@ -49,12 +49,12 @@ Runs individual Ansible scripts on the hosts with IDs listed in `hosts.ini`.
 | ------------ | --------------------------------------------------------------- |
 | `-d`         | Dry run, shows commands that would be executed                  |
 | `-h`         | Display help                                                    |
-| `-v`         | Increments verbose output (can be specified up to 3 times)      |
+| `-v`         | Increments verbose output (can be specified up to 4 times)      |
 | `-x`         | Debug mode                                                      |
 
 ## data/settings
 This file contiains configuration information about all the servers created from the `ec2Create` and `rdsCreate` commands.
-It is updated by the `provision` command and is referred to by the `psql` and ec2ssh commands. Here is a sample file:
+It is updated by the `provision` command and is referred to by the `psql` and `ec2ssh` commands. Here is a sample file:
 
 ````
 [
@@ -64,6 +64,7 @@ It is updated by the `provision` command and is referred to by the `psql` and ec
     "password": "myPassword",
     "publicKey": "myPublicKey",
     "keySignature": "myKeySignature",
+    "description": "Production",
     "types": [
       {"generic": "provisioned"},
       {"postgresServer": "notProvisionedYet"},
