@@ -3,7 +3,7 @@
 function help {
   echo "Creates an EC2 server."
   echo "This operation takes several seconds, during which time the server is not available."
-  echo -e "\nUsage: $(basename $0) [options] instanceId keyPairName classFQ amiId type userId password\n"
+  echo -e "\nUsage: $(basename $0) [options] instanceId keyPairName classFQ amiId type userId password [description]\n"
   echo "Options are:"
   echo "  -c         Count of instances to launch"
   echo "  -d         Dry run - show command that would be executed"
@@ -23,11 +23,13 @@ function help {
   echo "  type         One of: generic, playServer or postgresServer."
   echo "  userId       Ubuntu user id."
   echo "  password     Ubuntu user's password."
+  echo "  description  Helps to identify the instance."
   echo ""
   echo "Examples:"
   echo "  Create generic Ubuntu 13.10 micro image in us-east-1c, and wait for the process to complete before returning."
-  echo "  Ubuntu user name fred has password yabbadabbadoo:"
-  echo "  $(basename $0) -w testServer testKey t1.micro ami-4b143122 fred yabbadabbadoo"
+  echo "  Ubuntu user name fred has password yabbadabbadoo."
+  echo "  This server's description is 'Load testing server'"
+  echo "  $(basename $0) -w testServer testKey t1.micro ami-4b143122 fred yabbadabbadoo 'Load testing server'"
   echo ""
   echo "  Create Play server using Ubuntu 13.10 micro image in us-east-1c, and wait for the process to complete before returning:"
   echo "  $(basename $0) -w testServer testKey t1.micro ami-4b143122 playServer fred yabbadabbadoo"
@@ -74,23 +76,23 @@ while getopts ":c:de:xp:qs:u:z:wh?" opt; do
 done
 shift $(($OPTIND-1))
 
-if [ $# -lt 6 ]; then help; fi
+if [ $# -lt 6 ] || [ $# -gt 7 ]; then help; fi
 if [ "$DEBUG" ]; then set -xv; fi
 
 if [ -z "$ANSIBLE_DATA_DIR" ]; then ANSIBLE_DATA_DIR=.; fi
 
-if [ -z "$1" ]; then 
+if [ -z "$1" ]; then
   echo -e "Error: instanceId must be specified.\n"
   help
-else 
+else
   INSTANCE_ID="$1"
   shift
 fi
 
-if [ -z "$1" ]; then 
+if [ -z "$1" ]; then
   echo -e "Error: keyPairName must be specified.\n"
   help
-else 
+else
   KEY_PAIR_NAME="$1"
   KEY_NAME="--key-name $KEY_PAIR_NAME"
   KEY_NAMES="--key-names $KEY_PAIR_NAME"
@@ -98,27 +100,27 @@ else
   shift
 fi
 
-if [ -z "$1" ]; then 
+if [ -z "$1" ]; then
   echo -e "Error: class must be specified.\n"
   help
-else 
+else
   CLASS_FQ="--instance-type $1"
   shift
 fi
 
-if [ -z "$1" ]; then 
+if [ -z "$1" ]; then
   echo -e "Error: AMI ID must be specified.\n"
   help
-else 
+else
   AMI_ID="$1"
   IMAGE_ID="--image-id $AMI_ID"
   shift
 fi
 
-if [ -z "$1" ]; then 
+if [ -z "$1" ]; then
   echo -e "Error: type must be specified.\n"
   help
-else 
+else
   if [[ ! "generic playServer postgresServer" =~ "$1" ]]; then
     echo -e "Error: type '$1' is invalid; must be one of generic, playServer or postgresServer.\n"
     help
@@ -127,7 +129,7 @@ else
   shift
 fi
 
-if [ -z "$1" ]; then 
+if [ -z "$1" ]; then
   echo -e "Error: userId must be specified.\n"
   help
 else
@@ -135,11 +137,18 @@ else
   shift
 fi
 
-if [ -z "$1" ]; then 
+if [ -z "$1" ]; then
   echo -e "Error: password must be specified.\n"
   help
-else 
+else
   PASSWORD="$1"
+  shift
+fi
+
+if [ -z "$1" ]; then
+  DESCRIPTION=""
+else
+  DESCRIPTION="$1"
   shift
 fi
 
@@ -153,9 +162,9 @@ JSON=`DO aws ec2 run-instances $IMAGE_ID $AZ $COUNT $CLASS_FQ $DRY $KEY_NAME $OU
 
 INSTANCE_ID=`echo "$JSON" | grep "InstanceId" | cut -d'"' -f4`
 if [ -z "$DRY" ]; then
-  data $DEBUG add $INSTANCE_ID $TYPE $USER_ID $PASSWORD $KEY_PAIR_NAME
+  data $DEBUG add $INSTANCE_ID $TYPE $USER_ID $PASSWORD $KEY_PAIR_NAME $DESCRIPTION
   if [ "$WAIT" ]; then
-    echo -n "Creating..." 
+    echo -n "Creating..."
     while [ "$(ec2Status $INSTANCE_ID)" == "pending" ]; do
       echo -n "."
       sleep 5

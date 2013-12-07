@@ -5,6 +5,7 @@ function help {
   echo -e "\nUsage: $(basename $0) [option] i-7cf09e18\n"
   echo "Where options are:"
   echo "Options are:"
+  echo "  -d  return server description"
   echo "  -h  Display help"
   echo "  -i  return IP address (no output if the instance is stopped). This is the default"
   echo "  -n  return DNS name (no output if the instance is stopped)"
@@ -17,9 +18,14 @@ function parseJson {
   python -c "import sys, json; print json.load(sys.stdin)[$1]" $2
 }
 
+if [ -z "$ANSIBLE_DATA_DIR" ]; then ANSIBLE_DATA_DIR=data; fi
+DATA_FILE=$ANSIBLE_DATA_DIR/settings
+
 function GET_INFO {
   if [ "$1" == STATUS ]; then
     ec2Status $2
+  elif [ "$1" == DESCRIPTION ]; then
+    cat "$DATA_FILE" | jq ".| map(select(.instanceId == \"$2\").description)[0]"
   else
     echo "$XML" | grep "$1" | cut -d'"' -f4
   fi
@@ -28,13 +34,14 @@ function GET_INFO {
 if [ $# == 0 ] || [ $# -gt 2 ]; then help; fi
 
 NONE=true
-while getopts "ainsxh?" opt; do
+while getopts "dhinsx?" opt; do
   case $opt in
-    i) IP_ADDR=true;  unset NONE ;;
-    n) DNS_NAME=true; unset NONE ;;
-    s) STATUS=true;   unset NONE ;;
-    x) DEBUG=true                ;;
-    *) help                      ;;
+    d) DESCRIPTION=true; unset NONE ;;
+    i) IP_ADDR=true;     unset NONE ;;
+    n) DNS_NAME=true;    unset NONE ;;
+    s) STATUS=true;      unset NONE ;;
+    x) DEBUG=true                   ;;
+    *) help                         ;;
   esac
 done
 shift $(($OPTIND-1))
@@ -42,18 +49,22 @@ shift $(($OPTIND-1))
 XML=`aws ec2 describe-instances --filters Name=instance-id,Values=$1`
 if [ "$DEBUG" ]; then set -xv; fi
 
-if [ "$IP_ADDR" ] || [ "$NONE" ]; then 
+if [ "$IP_ADDR" ] || [ "$NONE" ]; then
   R=$(GET_INFO PublicIpAddress)
   SPACE=" "
 fi
 
-if [ "$DNS_NAME" ]; then 
+if [ "$DNS_NAME" ]; then
   R="$R$SPACE$(GET_INFO PublicDnsName)"
   SPACE=" "
 fi
 
-if [ "$STATUS" ]; then 
+if [ "$STATUS" ]; then
   R="$R$SPACE$(GET_INFO STATUS $1)"
+fi
+
+if [ "$DESCRIPTION" ]; then
+  R="$R$SPACE$(GET_INFO DESCRIPTION $1)"
 fi
 
 echo "$R"

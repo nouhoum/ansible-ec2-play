@@ -11,6 +11,12 @@ function help {
   exit -1
 }
 
+function TYPE_IDS {
+  echo "$DATA" | jq -r "[.[]|select(.types[].$1 == \"notProvisioned\")|.instanceId]|sort|unique|.[]"
+}
+
+# TODO translate type-id to domain name for hosts.ini
+
 set -e
 
 while getopts "dhvx?" opt; do
@@ -25,55 +31,74 @@ shift $(($OPTIND-1))
 
 if [ "$DEBUG" ]; then set -xv; fi
 
+if [ -z "$ANSIBLE_DATA_DIR" ]; then ANSIBLE_DATA_DIR=data; fi
+DATA_FILE=$ANSIBLE_DATA_DIR/settings
+
+DATA="$(cat "$DATA_FILE")"
+
+echo "[generic.domains]" > hosts.ini
+TYPE_IDS generic >> hosts.ini
+TYPE_IDS playServers >> hosts.ini
+TYPE_IDS postgresServers >> hosts.ini
+
+echo -e "\n[playServer.domains]" >> hosts.ini
+TYPE_IDS playServers >> hosts.ini
+
+echo -e "\n[postgresServer.domains]" >> hosts.ini
+TYPE_IDS postgresServers >> hosts.ini
+
+
 # Generic Ubuntu servers
 bin/run $DEBUG $VERBOSE "$@" bootstrap
 RC=$?
-if [ 0 == $RC ]; then 
+if [ 0 == $RC ]; then
   echo "Generic servers have been provisioned. TODO Remove Contents from generic.domains section of hosts.ini"
 else
   echo "Error: Generic server provisioning failed"
 fi
 
 # Postgres servers
-if [ $RC == 0 ]; then 
+if [ $RC == 0 ]; then
   bin/run $DEBUG $VERBOSE "$@" postgresEnv
   RC=$?
 fi
-if [ $RC == 0 ]; then 
+if [ $RC == 0 ]; then
   echo "Postgres servers have been provisioned. TODO Remove Contents from postgres.domains section of hosts.ini"
   #TODO psql restore for each RDS Postgres server and each server mentioned in the postgres.domains section of hosts.ini
 else
   echo "Error: Postgres server provisioning failed"
 fi
 
-if [ $RC == 0 ]; then 
+if [ $RC == 0 ]; then
   bin/run $DEBUG $VERBOSE "$@" playEnv
   RC=$?
 fi
 
-if [ $RC == 0 ]; then 
+if [ $RC == 0 ]; then
   bin/run $DEBUG $VERBOSE "$@" playService
   RC=$?
 else
   echo "Error: Play server environment setup(s) failed"
 fi
 
-if [ $RC == 0 ]; then 
+if [ $RC == 0 ]; then
   bin/run $DEBUG $VERBOSE "$@" playDeploy
   RC=$?
 else
   echo "Error: Installation of Play application service(s) failed"
 fi
 
-if [ $RC == 0 ]; then 
+if [ $RC == 0 ]; then
   bin/run $DEBUG $VERBOSE "$@" playLaunch
 else
   echo "Error: Play application deployment to server(s) failed"
 fi
 
-if [ $RC == 0 ]; then 
+if [ $RC == 0 ]; then
   echo "Postgres servers have been provisioned. TODO Remove Contents from play.domains section of hosts.ini"
   echo "All done!"
 else
   echo "Error: Play application launch(es) failed"
 fi
+
+#rm -f "$DATA_FILE"

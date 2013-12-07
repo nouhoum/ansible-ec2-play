@@ -9,14 +9,15 @@ function help {
   #echo "  operation is one of add, ignore, modify or remove."
   echo "  instanceId is the EC2 instance ID to consider"
   echo "  type is only required for the add operation. One of: generic, playServer or postgresServer"
-  echo "  parameters are only required for the add operation. All of: userId, password and keyPairName"
+  echo "  parameters are only required for the add operation. Consists of userId, password and keyPairName, and optionally description"
   echo ""
   echo "Options are:"
   echo "  -h        Display help"
   echo "  -x        Debug mode"
   echo ""
   echo "Examples:"
-  echo "  data add    i-234568 generic userName password keyPairName"
+  echo "  data add    i-234568 generic myUserName myPassword myKeyPairName"
+  echo "  data add    i-234568 generic marysUserName marysPassword marysKeyPairName 'Load testing server'"
   echo "  data remove i-234567"
   exit -1
 }
@@ -28,6 +29,7 @@ function NEW_SERVER {
   esac
   cat <<EOF
 {
+  "description":"$6",
   `if [ "$5" ]; then echo " \"keyPairName\":\"$5\", "; fi`
   `if [ "$4" ]; then echo " \"password\":\"$4\", "; fi`
   `if [ "$3" ]; then echo " \"user\":\"$3\", "; fi`
@@ -35,10 +37,6 @@ function NEW_SERVER {
   "instanceId":"$1"
 }
 EOF
-}
-
-function TYPE_IDS {
-  echo "$DATA" | jq -r ". | map(select(.type == \"$1\")) | .[].instanceId"
 }
 
 function TEST_TYPE {
@@ -81,12 +79,17 @@ case "$1" in
     if [ $# -eq 3 ]; then help "Missing userId, password and keyPairName"; fi
     if [ $# -eq 4 ]; then help "Missing password and keyPairName"; fi
     if [ $# -eq 5 ]; then help "Missing keyPairName"; fi
-    if [ $# -gt 6 ]; then help "Too many arguments were supplied"; fi
+    if [ $# -gt 7 ]; then help "Too many arguments were supplied"; fi
+    if [ -z "$7" ]; then
+      DESCRIPTION=""
+    else
+      DESCRIPTION="$7"
+    fi
     TEST_TYPE $@
     # TODO check for an entry with the given instanceId and delete it if found
     CONTENTS="$DATA"
     if [ -z "$CONTENTS" ]; then CONTENTS="$EMPTY_DATA"; fi
-    echo "$CONTENTS" | jq ". += [`NEW_SERVER $2 $3 $4 $5 $6`]" > $DATA_FILE
+    echo "$CONTENTS" | jq ". += [`NEW_SERVER $2 $3 $4 $5 $6 \"$DESCRIPTION\"`]" > $DATA_FILE
     ;;
 
   modify) # Not defined or implemented; must edit data/settings manually
@@ -105,16 +108,3 @@ case "$1" in
     echo -e "Error: Unknown operation\n"
     help
 esac
-
-DATA="$(cat "$DATA_FILE")"
-
-echo "[generic.domains]" > hosts.ini
-TYPE_IDS generic >> hosts.ini
-TYPE_IDS playServers >> hosts.ini
-TYPE_IDS postgresServers >> hosts.ini
-
-echo -e "\n[playServer.domains]" >> hosts.ini
-TYPE_IDS playServers >> hosts.ini
-
-echo -e "\n[postgresServer.domains]" >> hosts.ini
-TYPE_IDS postgresServers >> hosts.ini
