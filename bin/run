@@ -64,7 +64,10 @@ CHECK_PACKAGE ansible-playbook ansible
 CHECK_PACKAGE jq jq
 CHECK_PACKAGE pip python-pip
 if [ -z "$(which pip)" ]; then easy_install pip; fi
-if [ -z "$(which aws)" ]; then pip install awscli; fi
+if [ -z "$(which aws)" ]; then
+  pip install awscli
+  complete -C aws_completer aws
+fi
 
 if [ -f bin/custom ]; then
   source bin/custom

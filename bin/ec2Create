@@ -8,10 +8,8 @@ function help {
   echo "  -c         Count of instances to launch"
   echo "  -d         Dry run - show command that would be executed"
   echo "  -h         Display help"
-  echo "  -p string  Superuser password, set to blahblah if not specified"
   echo "  -q         Quiet mode; suppress all output"
   echo "  -s string  Security group"
-  echo "  -u string  Superuser name, set to devops if not specified"
   echo "  -w         Wait until operation is complete before returning"
   echo "  -x         Debug mode"
   echo "  -z string  Availability Zone; defaults to us-east-1c. See http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-regions-availability-zones.html"
@@ -21,8 +19,8 @@ function help {
   echo "  classFQ      is one of the instance type values documented here: http://aws.amazon.com/ec2/instance-types/#instance-details, for example: t1.micro"
   echo "  amiId        is the AMI image ID, documented here: https://aws.amazon.com/marketplace/ref=mkt_ste_amis_redirect?b_k=291 and http://cloud-images.ubuntu.com/releases/13.10/release/, for example: ami-4b143122"
   echo "  type         One of: generic, playServer or postgresServer."
-  echo "  userId       Ubuntu user id."
-  echo "  password     Ubuntu user's password."
+  echo "  userId       Non-privileged Ubuntu user id."
+  echo "  password     Non-privileged Ubuntu user's password."
   echo "  description  Helps to identify the instance."
   echo ""
   echo "Examples:"
@@ -42,6 +40,38 @@ function help {
   exit -1
 }
 
+function DISTRO {
+  NAME=`aws ec2 describe-images --image-ids ami-4b143122 | jq -r ".Images[].Name"`
+  case "$NAME" in
+    *ubuntu*)
+      ROOT_USER=ubuntu
+      ;;
+
+    *)
+      echo "Unknown OS: $NAME"
+      exit -1
+      ;;
+  esac
+  case "$NAME" in
+    *quantal*)
+      ANSIBLE_UBUNTU_RELEASE=quantal
+      ;;
+
+    *raring*)
+      ANSIBLE_UBUNTU_RELEASE=raring
+      ;;
+
+    *saucy*)
+      ANSIBLE_UBUNTU_RELEASE=saucy
+      ;;
+
+    *)
+      echo "Unknown OS release: $NAME"
+      exit -2
+      ;;
+  esac
+}
+
 set -e
 
 exec 3>&1
@@ -56,18 +86,15 @@ function DO {
 AZ="--placement AvailabilityZone=us-east-1c"
 COUNT="--count 1"
 OUTPUT="--output json"
-ROOT_PASSWORD="blahblah"
 ROOT_USER="devops"
 USER_DATA="--user-data HowToUseThis"
 
-while getopts ":c:de:xp:qs:u:z:wh?" opt; do
+while getopts ":c:de:xqs:z:wh?" opt; do
   case $opt in
     c) COUNT="--count $OPTARG"                    ;;
     d) DRY="--dry-run"                            ;;
-    p) ROOT_PASSWORD="$OPTARG"                    ;;
     q) QUIET=true                                 ;;
     s) SECURITY_GROUP="--security-groups $OPTARG" ;;
-    u) ROOT_USER="$OPTARG"                        ;;
     w) WAIT=true                                  ;;
     x) DEBUG="-x"                                 ;;
     z) AZ="--placement AvailabilityZone=$OPTARG"  ;;
@@ -158,7 +185,7 @@ if [[ "$(aws ec2 describe-key-pairs $KEY_NAMES 2>&1)" == *"does not exist" ]]; t
 fi
 trap - SIGTERM
 
-JSON=`DO aws ec2 run-instances -u $ROOT_USER -p $ROOT_PASSWORD $IMAGE_ID $AZ $COUNT $CLASS_FQ $DRY $KEY_NAME $OUTPUT $SECURITY_GROUP $QUIET`
+JSON=`DO aws ec2 run-instances -u $ROOT_USER $IMAGE_ID $AZ $COUNT $CLASS_FQ $DRY $KEY_NAME $OUTPUT $SECURITY_GROUP $QUIET`
 
 INSTANCE_ID=`echo "$JSON" | grep "InstanceId" | cut -d'"' -f4`
 if [ -z "$DRY" ]; then

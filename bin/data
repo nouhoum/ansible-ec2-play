@@ -3,21 +3,26 @@
 function help {
   if [ "$1" ]; then echo -e "Error: $1\n"; fi
   echo "Maintains $DATA_FILE and hosts.ini"
-  echo -e "\nUsage: $(basename $0) [options] operation instanceId [type [parameters]]\n"
+  echo -e "\nUsage: $(basename $0) [options] operation instanceId [addParameters]\n"
   echo "Where:"
   echo "  operation is one of add or remove."
-  #echo "  operation is one of add, ignore, modify or remove."
+  #echo "  operation is one of add, modify or remove."
   echo "  instanceId is the EC2 instance ID to consider"
-  echo "  type is only required for the add operation. One of: generic, playServer or postgresServer"
-  echo "  parameters are only required for the add operation. Consists of userId, password and keyPairName, and optionally description"
+  echo "  addParameters are only required for the add operation. Consists of:"
+  echo "    - type: one of generic, playServer or postgresServer"
+  echo "    - rootUserId: super user ID (set by AMI image)"
+  echo "    - userId: regular user ID"
+  echo "    - password: regular user password"
+  echo "    - keyPairName: name of key pair, will be used to name the .pem file in data"
+  echo "    - description: optional"
   echo ""
   echo "Options are:"
   echo "  -h        Display help"
   echo "  -x        Debug mode"
   echo ""
   echo "Examples:"
-  echo "  data add    i-234568 generic myUserName myPassword myKeyPairName"
-  echo "  data add    i-234568 generic marysUserName marysPassword marysKeyPairName 'Load testing server'"
+  echo "  data add    i-234568 generic rootUserId myUserName myPassword myKeyPairName"
+  echo "  data add    i-234568 generic rootUserId marysUserName marysPassword marysKeyPairName 'Load testing server'"
   echo "  data remove i-234567"
   exit -1
 }
@@ -30,9 +35,10 @@ function NEW_SERVER {
   cat <<EOF
 {
   "description":"$6",
-  `if [ "$5" ]; then echo " \"keyPairName\":\"$5\", "; fi`
-  `if [ "$4" ]; then echo " \"password\":\"$4\", "; fi`
-  `if [ "$3" ]; then echo " \"user\":\"$3\", "; fi`
+  `if [ "$6" ]; then echo " \"keyPairName\":\"$6\", "; fi`
+  `if [ "$5" ]; then echo " \"password\":\"$5\", "; fi`
+  `if [ "$4" ]; then echo " \"user\":\"$4\", "; fi`
+  `if [ "$3" ]; then echo " \"rootUserId\":\"$3\", "; fi`
   "types":$TYPES,
   "instanceId":"$1"
 }
@@ -74,12 +80,13 @@ DATA="$(cat "$DATA_FILE")"
 
 case "$1" in
   add)
-    if [ $# -eq 1 ]; then help "Missing instanceId, type, userId, password and keyPairName"; fi
-    if [ $# -eq 2 ]; then help "Missing type, userId, password and keyPairName"; fi
-    if [ $# -eq 3 ]; then help "Missing userId, password and keyPairName"; fi
-    if [ $# -eq 4 ]; then help "Missing password and keyPairName"; fi
-    if [ $# -eq 5 ]; then help "Missing keyPairName"; fi
-    if [ $# -gt 7 ]; then help "Too many arguments were supplied"; fi
+    if [ $# -eq 1 ]; then help "Missing instanceId, type, rootUserId, userId, password and keyPairName"; fi
+    if [ $# -eq 2 ]; then help "Missing type, rootUserId, userId, password and keyPairName"; fi
+    if [ $# -eq 3 ]; then help "Missing rootUserId, userId, password and keyPairName"; fi
+    if [ $# -eq 4 ]; then help "Missing userId, password and keyPairName"; fi
+    if [ $# -eq 5 ]; then help "Missing password and keyPairName"; fi
+    if [ $# -eq 6 ]; then help "Missing keyPairName"; fi
+    if [ $# -gt 8 ]; then help "Too many arguments were supplied"; fi
     if [ -z "$7" ]; then
       DESCRIPTION=""
     else

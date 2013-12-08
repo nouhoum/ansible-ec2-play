@@ -75,6 +75,10 @@ Install and configure the following.
 * [AWS command-line toolkit](http://aws.amazon.com/developertools/2928).
 [General AWS command-line documentation](http://aws.amazon.com/cli/).
 [AWS RDS command-line documentation](http://docs.aws.amazon.com/AmazonRDS/latest/CommandLineReference/Welcome.html).
+* Enable bash command-line completion for AWS cli:
+````
+complete -C aws_completer aws
+````
 
 ## Setup
 
