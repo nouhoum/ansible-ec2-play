@@ -129,16 +129,21 @@ Given an EC2 instance id, return the IP address, domain name or status.
 
 **Usage**
 
-    ec2Info [option] i-7cf09e18
+    ec2Info [options] instanceIds
+
+`instanceIds` are a space-delimited list of zero or more EC2 instance IDs.
+If an empty list is provided then there is no output and no error.
+Nonexistant instanceIDs are quietly ignored.
 
 **Options**
 
 | Option       | Description                                                     |
 | ------------ | --------------------------------------------------------------- |
+| `-e`         | Return server description                                       |
 | `-h`         | Display help                                                    |
-| `-i`         | return IP address (no output if the instance is stopped)        |
-| `-n`         | return DNS name (no output if the instance is stopped)          |
-| `-s`         | return status (running or stopped)                              |
+| `-i`         | Return IP address (no output if the instance is stopped)        |
+| `-n`         | Return DNS name (no output if the instance is stopped)          |
+| `-s`         | Return status (running or stopped)                              |
 | `-x`         | Debug mode                                                      |
 
 ## ec2InstanceId

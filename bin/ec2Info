@@ -1,21 +1,20 @@
 #!/bin/bash
 
 function help {
-  echo "Given an EC2 instance id, return the IP address, domain name or status"
-  echo -e "\nUsage: $(basename $0) [option] i-7cf09e18\n"
-  echo "Where options are:"
-  echo "Options are:"
-  echo "  -d  return server description"
-  echo "  -h  Display help"
-  echo "  -i  return IP address (no output if the instance is stopped). This is the default"
-  echo "  -n  return DNS name (no output if the instance is stopped)"
-  echo "  -s  return status (running or stopped)"
-  echo "  -x  Debug mode"
+  echo "Return the IP address, domain name or status of the given EC2 instanceIDs"
+  echo -e "\nUsage: $(basename $0) [options] instanceIds\n"
+  echo "Where:"
+  echo "  instanceIds are a space-delimited list of zero or more EC2 instance IDs"
+  echo "              If an empty list is provided then there is no output and no error."
+  echo "              Nonexistant instanceIDs are quietly ignored."
+  echo "  options are:"
+  echo "    -e  Return server description"
+  echo "    -h  Display help"
+  echo "    -i  Return IP address (no output if the instance is stopped). This is the default"
+  echo "    -n  Return DNS name (no output if the instance is stopped)"
+  echo "    -s  Return status (running or stopped)"
+  echo "    -x  Debug mode"
   exit -1
-}
-
-function parseJson {
-  python -c "import sys, json; print json.load(sys.stdin)[$1]" $2
 }
 
 if [ -z "$ANSIBLE_DATA_DIR" ]; then ANSIBLE_DATA_DIR=data; fi
@@ -31,12 +30,12 @@ function GET_INFO {
   fi
 }
 
-if [ $# == 0 ] || [ $# -gt 2 ]; then help; fi
+if [ $# -eq 0 ]; then exit 0; fi
 
 NONE=true
-while getopts "dhinsx?" opt; do
+while getopts "ehinsx?" opt; do
   case $opt in
-    d) DESCRIPTION=true; unset NONE ;;
+    e) DESCRIPTION=true; unset NONE ;;
     i) IP_ADDR=true;     unset NONE ;;
     n) DNS_NAME=true;    unset NONE ;;
     s) STATUS=true;      unset NONE ;;
@@ -46,7 +45,7 @@ while getopts "dhinsx?" opt; do
 done
 shift $(($OPTIND-1))
 
-XML=`aws ec2 describe-instances --filters Name=instance-id,Values=$1`
+XML=`aws ec2 describe-instances --instance-ids $@`
 if [ "$DEBUG" ]; then set -xv; fi
 
 if [ "$IP_ADDR" ] || [ "$NONE" ]; then
