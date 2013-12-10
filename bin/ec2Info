@@ -8,6 +8,7 @@ function help {
   echo "              If an empty list is provided then there is no output and no error."
   echo "              Nonexistant instanceIDs are quietly ignored."
   echo "  options are:"
+  echo "    -a  Return all available information"
   echo "    -e  Return server description"
   echo "    -h  Display help"
   echo "    -i  Return IP address (no output if the instance is stopped). This is the default"
@@ -33,8 +34,16 @@ function GET_INFO {
 if [ $# -eq 0 ]; then exit 0; fi
 
 NONE=true
-while getopts "ehinsx?" opt; do
+while getopts "aehinsx?" opt; do
   case $opt in
+    a) ALL=true
+       DESCRIPTION=true
+       IP_ADDR=true
+       DNS_NAME=true
+       STATUS=true
+       unset NONE
+       ;;
+
     e) DESCRIPTION=true; unset NONE ;;
     i) IP_ADDR=true;     unset NONE ;;
     n) DNS_NAME=true;    unset NONE ;;
@@ -45,25 +54,46 @@ while getopts "ehinsx?" opt; do
 done
 shift $(($OPTIND-1))
 
-XML=`aws ec2 describe-instances --instance-ids $@`
-if [ "$DEBUG" ]; then set -xv; fi
+for I in $@; do
+  XML=`aws ec2 describe-instances --instance-ids $I`
+  if [ "$DEBUG" ]; then set -xv; fi
 
-if [ "$IP_ADDR" ] || [ "$NONE" ]; then
-  R=$(GET_INFO PublicIpAddress)
-  SPACE=" "
-fi
+  if [ "$ALL" ] || [ "$NONE" ]; then
+    R="$I"
+    SPACE=" "
+  fi
 
-if [ "$DNS_NAME" ]; then
-  R="$R$SPACE$(GET_INFO PublicDnsName)"
-  SPACE=" "
-fi
+  if [ "$IP_ADDR" ]; then
+    X="$(GET_INFO PublicIpAddress)"
+    if [ "$X" ]; then
+      R="$R$SPACE$X"
+      SPACE=" "
+    fi
+  fi
 
-if [ "$STATUS" ]; then
-  R="$R$SPACE$(GET_INFO STATUS $1)"
-fi
+  if [ "$DNS_NAME" ]; then
+    X="$(GET_INFO PublicDnsName)"
+    if [ "$X" ]; then
+      R="$R$SPACE$X"
+      SPACE=" "
+    fi
+  fi
 
-if [ "$DESCRIPTION" ]; then
-  R="$R$SPACE$(GET_INFO DESCRIPTION $1)"
-fi
+  if [ "$STATUS" ]; then
+    X="$(GET_INFO STATUS $I)"
+    if [ "$X" ]; then
+      R="$R$SPACE$X"
+      SPACE=" "
+    fi
+  fi
 
-echo "$R"
+  if [ "$DESCRIPTION" ]; then
+    X="$(GET_INFO DESCRIPTION $1)"
+    if [ "$X" ]; then
+      R="$R$SPACE'$X'"
+      SPACE=" "
+    fi
+  fi
+
+  echo "$R"
+done
