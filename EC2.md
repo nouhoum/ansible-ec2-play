@@ -6,17 +6,16 @@ The ID of the new EC2 instance is automatically added to `$ANSIBLE_DATA_DIR/data
 
 **Usage**
 
-    ec2Create [options] instanceId keyPairName classFQ amiId [types]
+    ec2Create [options] keyPairName classFQ amiId type userId password [description]
 
 Where:
 
 | Option        | Description                                                                                                               |
 | ------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `keyPairName` | Key pair name, which will be created and stored in the `data/` directory if not already defined.                          |
+| `classFQ`     | Is one of the [instance type values](http://aws.amazon.com/ec2/instance-types/#instance-details), for example: `t1.micro` |
 | `amiId`       | AMI image ID listed in [general images](https://aws.amazon.com/marketplace/ref=mkt_ste_amis_redirect?b_k=291) and [Ubuntu images](http://cloud-images.ubuntu.com/releases/13.10/release/), for example: `ami-51274050` |
-| `classFQ`     | is one of the [instance type values](http://aws.amazon.com/ec2/instance-types/#instance-details), for example: `t1.micro`                             |
-| `keyPairName` | key pair name, which will be created and stored in the `data/` directory if not already defined.                                                      |
-| `types`       | is an optional space-delimited list of types. Choices are: generic, playServers and postgresServers. If not specified, this will be a generic server. |
-| `instanceId`  | EC2 instance ID                                                                                                                                       |
+| `type`        | One of: generic, playServer or postgresServer. If not specified, this will be a generic server.                           |
 
 **Options**
 
@@ -25,10 +24,8 @@ Where:
 | `-c`         | Count of instances to launch                                    |
 | `-d`         | Dry run, shows commands that would be executed                  |
 | `-h`         | Display help                                                    |
-| `-p string`  | Superuser password, set to `blahblah` if not specified          |
 | `-q`         | Quiet mode; suppress all output                                 |
 | `-s string`  | Security group                                                  |
-| `-u string`  | Superuser name, set to `devops` if not specified                |
 | `-w`         | Wait for the process to complete before returning               |
 | `-x`         | Debug mode                                                      |
 | `-z string`  | [Availability Zone](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-regions-availability-zones.html); defaults to `us-east-1c` |
@@ -38,19 +35,19 @@ Where:
 Create a generic Ubuntu 13.10 micro image in the default availability zone with the default security group, and wait for the process to complete before returning.
 Define key pair `testKey` if it does not already exist.
 
-    ec2Create -w testServer testKey t1.micro ami-4b143122
+    ec2Create -w testServer testKey t1.micro ami-4b143122 generic fred yabbadabbadoo 'Just for experimentation'"
 
 Create a Play server using Ubuntu 13.10 micro image in `us-east-1c`, and wait for the process to complete before returning:
 
-    ec2Create -w testServer testKey t1.micro ami-4b143122 playServer
+    ec2Create -w testServer testKey t1.micro ami-4b143122 playServer fred yabbadabbadoo
 
 Create a Postgres server using Ubuntu 13.10 micro image in `us-east-1c`, and wait for the process to complete before returning:
 
-    ec2Create -w testServer testKey t1.micro ami-4b143122 postgresServer
+    ec2Create -w testServer testKey t1.micro ami-4b143122 postgresServer fred yabbadabbadoo
 
 Create a server with Play and Postgres using Ubuntu 13.10 micro image in `us-east-1c`, and wait for the process to complete before returning:
 
-    ec2Create -w testServer testKey t1.micro ami-4b143122 playServers postgresServer
+    ec2Create -w testServer testKey t1.micro ami-4b143122 playServers postgresServer fred yabbadabbadoo
 
 ## ec2Delete
 Deletes one or more EC2 instance(s).

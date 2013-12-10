@@ -3,7 +3,7 @@
 function help {
   echo "Creates an EC2 server."
   echo "This operation takes several seconds, during which time the server is not available."
-  echo -e "\nUsage: $(basename $0) [options] instanceId keyPairName classFQ amiId type userId password [description]\n"
+  echo -e "\nUsage: $(basename $0) [options] keyPairName classFQ amiId type userId password [description]\n"
   echo "Options are:"
   echo "  -c         Count of instances to launch"
   echo "  -d         Dry run - show command that would be executed"
@@ -14,7 +14,6 @@ function help {
   echo "  -x         Debug mode"
   echo "  -z string  Availability Zone; defaults to us-east-1c. See http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-regions-availability-zones.html"
   echo -e "\nWhere:"
-  echo "  instanceId   is the EC2 instance ID"
   echo "  keyPairName  is the name of the key pair, which will be created and stored in the data/ directory if not already defined"
   echo "  classFQ      is one of the instance type values documented here: http://aws.amazon.com/ec2/instance-types/#instance-details, for example: t1.micro"
   echo "  amiId        is the AMI image ID, documented here: https://aws.amazon.com/marketplace/ref=mkt_ste_amis_redirect?b_k=291 and http://cloud-images.ubuntu.com/releases/13.10/release/, for example: ami-4b143122"
@@ -44,7 +43,7 @@ function DISTRO {
   NAME=`aws ec2 describe-images --image-ids ami-4b143122 | jq -r ".Images[].Name"`
   case "$NAME" in
     *ubuntu*)
-      ROOT_USER=ubuntu
+      ROOT_USER_ID=ubuntu
       ;;
 
     *)
@@ -102,18 +101,10 @@ while getopts ":c:de:xqs:z:wh?" opt; do
 done
 shift $(($OPTIND-1))
 
-if [ $# -lt 6 ] || [ $# -gt 8 ]; then help; fi
+if [ $# -lt 5 ] || [ $# -gt 7 ]; then help; fi
 if [ "$DEBUG" ]; then set -xv; fi
 
 if [ -z "$ANSIBLE_DATA_DIR" ]; then ANSIBLE_DATA_DIR=.; fi
-
-if [ -z "$1" ]; then
-  echo -e "Error: instanceId must be specified.\n"
-  help
-else
-  INSTANCE_ID="$1"
-  shift
-fi
 
 if [ -z "$1" ]; then
   echo -e "Error: keyPairName must be specified.\n"
@@ -188,8 +179,8 @@ JSON=`DO aws ec2 run-instances $IMAGE_ID $AZ $COUNT $CLASS_FQ $DRY $KEY_NAME $OU
 
 INSTANCE_ID=`echo "$JSON" | grep "InstanceId" | cut -d'"' -f4`
 if [ -z "$DRY" ]; then
-  # TODO add ROOT_USER and ROOT_PWD
-  data $DEBUG add $INSTANCE_ID $TYPE $USER_ID $PASSWORD $KEY_PAIR_NAME "$DESCRIPTION"
+  # TODO add ROOT_USER_ID, found from AMI instance info
+  data $DEBUG add $INSTANCE_ID $TYPE $ROOT_USER_ID $USER_ID $PASSWORD $KEY_PAIR_NAME "$DESCRIPTION"
   if [ "$WAIT" ]; then
     echo -n "Creating..."
     while [ "$(ec2Status $INSTANCE_ID)" == "pending" ]; do
